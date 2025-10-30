@@ -64,6 +64,22 @@ function AnimalChallenge() {
     []
   );
 
+  // Preload all animal images once to avoid loading delays between rounds
+  const preloadedImagesRef = useRef<Record<string, HTMLImageElement>>({});
+  useEffect(() => {
+    const cache = preloadedImagesRef.current;
+    animals.forEach((a) => {
+      const key = String(a.image);
+      if (!cache[key]) {
+        const img = new Image();
+        img.src = String(a.image);
+        img.decoding = "async";
+        img.loading = "eager";
+        cache[key] = img;
+      }
+    });
+  }, [animals]);
+
   const getLevel = (round: number) => {
     if (round <= 3) return "Dễ";
     if (round <= 6) return "Trung bình";
@@ -108,12 +124,12 @@ function AnimalChallenge() {
       scale: number;
     }>
   >([]);
-   const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const highlightIntervalRef = useRef<number | null>(null);
   const highlightTimeoutRef = useRef<number | null>(null);
   const roundHighlightScheduleRef = useRef<number | null>(null);
-   const gridSectionRef = useRef<HTMLDivElement | null>(null);
+  const gridSectionRef = useRef<HTMLDivElement | null>(null);
 
   // Resolve audio URL via Vite so it works from src/assets
   const audioUrl = useMemo(
@@ -125,6 +141,13 @@ function AnimalChallenge() {
   useEffect(() => {
     audioRef.current = new Audio(audioUrl);
     audioRef.current.loop = true;
+    // Preload audio to avoid delay on first play
+    audioRef.current.preload = "auto";
+    try {
+      audioRef.current.load();
+      // Warm the browser cache as a fallback
+      fetch(audioUrl, { cache: "force-cache" }).catch(() => {});
+    } catch {}
     return () => {
       if (timerRef.current) {
         window.clearTimeout(timerRef.current);
@@ -182,9 +205,18 @@ function AnimalChallenge() {
         const x = 5 + Math.random() * 90;
         const y = 5 + Math.random() * 90;
         const rotation = -10 + Math.random() * 20;
-        const opacity = 0.45 + Math.random() * 0.4;
+        const opacity = 0.35 + Math.random() * 0.4;
         const scale = 0.85 + Math.random() * 0.5;
-        cloud.push({ id: i, text: name, colorClass, x, y, rotation, opacity, scale });
+        cloud.push({
+          id: i,
+          text: name,
+          colorClass,
+          x,
+          y,
+          rotation,
+          opacity,
+          scale,
+        });
       }
       setHintCloud(cloud);
     };
@@ -198,9 +230,9 @@ function AnimalChallenge() {
     highlightIntervalRef.current = window.setInterval(() => {
       setHighlightIndex((idx) => {
         if (idx == null) return 0;
-         // Update hint cloud per tick for level 10
+        // Update hint cloud per tick for level 10
         if (currentRound === 10) {
-           regenerateHintCloud();
+          regenerateHintCloud();
         }
         if (idx >= 7) {
           if (highlightIntervalRef.current) {
@@ -276,18 +308,20 @@ function AnimalChallenge() {
     clearHighlightTimers();
     setHighlightIndex(null);
     setIsHighlightActive(false);
-     // Auto scroll to grid on small/tall-limited screens
-     window.setTimeout(() => {
-       const el = gridSectionRef.current;
-       if (!el) return;
-       const viewportH = window.innerHeight || document.documentElement.clientHeight;
-       // If viewport height is small or grid is not fully in view, scroll to it
-       const rect = el.getBoundingClientRect();
-       const needsScroll = viewportH < 750 || rect.top < 0 || rect.bottom > viewportH;
-       if (needsScroll) {
-         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-       }
-     }, 50);
+    // Auto scroll to grid on small/tall-limited screens
+    window.setTimeout(() => {
+      const el = gridSectionRef.current;
+      if (!el) return;
+      const viewportH =
+        window.innerHeight || document.documentElement.clientHeight;
+      // If viewport height is small or grid is not fully in view, scroll to it
+      const rect = el.getBoundingClientRect();
+      const needsScroll =
+        viewportH < 750 || rect.top < 0 || rect.bottom > viewportH;
+      if (needsScroll) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 50);
   };
 
   const handleStop = () => {
@@ -333,6 +367,19 @@ function AnimalChallenge() {
         await audioRef.current.play();
       } catch {}
     }
+    // Auto scroll to grid on small/tall-limited screens (mobile)
+    window.setTimeout(() => {
+      const el = gridSectionRef.current;
+      if (!el) return;
+      const viewportH =
+        window.innerHeight || document.documentElement.clientHeight;
+      const rect = el.getBoundingClientRect();
+      const needsScroll =
+        viewportH < 750 || rect.top < 0 || rect.bottom > viewportH;
+      if (needsScroll) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 50);
   };
 
   return (
@@ -349,7 +396,7 @@ function AnimalChallenge() {
                 top: `${h.y}%`,
                 transform: `translate(-50%, -50%) rotate(${h.rotation}deg) scale(${h.scale})`,
                 opacity: h.opacity,
-                textShadow: '0 2px 6px rgba(0,0,0,0.35)'
+                textShadow: "0 2px 6px rgba(0,0,0,0.35)",
               }}
             >
               {h.text}
@@ -417,13 +464,13 @@ function AnimalChallenge() {
               <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-linear-to-tr from-amber-500 via-lime-500 to-emerald-500 opacity-20 blur-2xl" />
 
               <div className="relative z-10">
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-4 gap-2 md:gap-4">
                   {grid.map((animal, idx) => (
                     <div
                       key={`${currentRound}-${idx}-${animal.id}`}
-                      className={`aspect-square grid place-items-center rounded-xl bg-white/10 text-4xl sm:text-5xl shadow-inner transition-shadow ${
+                      className={`aspect-square grid place-items-center rounded-xl bg-white/10 text-4xl sm:text-6xl shadow-inner transition-shadow ${
                         isHighlightActive && highlightIndex === idx
-                          ? "ring-2 ring-amber-400 shadow-xl shadow-amber-400/50"
+                          ? "ring-4 ring-amber-400 ring-offset-2 ring-offset-white/10 shadow-4xl shadow-amber-400/60"
                           : ""
                       }`}
                       title={animal.name}
