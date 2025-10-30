@@ -13,6 +13,7 @@ import ImageNhim from "@/assets/images/animal-challenge/nhim.jpg";
 import ImageRua from "@/assets/images/animal-challenge/rua.jpg";
 import ImageSoc from "@/assets/images/animal-challenge/soc.jpg";
 import ImageVit from "@/assets/images/animal-challenge/vit.jpg";
+import ImageQuestion from "@/assets/images/animal-challenge/question.jpg";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -198,7 +199,7 @@ function AnimalChallenge() {
         opacity: number;
         scale: number;
       }>;
-      const count = 10;
+      const count = 15;
       for (let i = 0; i < count; i += 1) {
         const name = pool[Math.floor(Math.random() * pool.length)]?.name ?? "";
         const colorClass = colors[Math.floor(Math.random() * colors.length)];
@@ -426,7 +427,7 @@ function AnimalChallenge() {
               Level: {getLevel(currentRound)}
             </span>
           </div>
-          <h1 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+          <h1 className="mt-4 text-xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
             Vòng {isFinished ? totalRounds : currentRound}/{totalRounds}
           </h1>
           <p className="mt-2 text-slate-300 max-w-2xl mx-auto text-sm sm:text-base">
@@ -468,17 +469,17 @@ function AnimalChallenge() {
                   {grid.map((animal, idx) => (
                     <div
                       key={`${currentRound}-${idx}-${animal.id}`}
-                      className={`aspect-square grid place-items-center rounded-xl bg-white/10 text-4xl sm:text-6xl shadow-inner transition-shadow ${
+                      className={`aspect-square grid place-items-center rounded-sm md:rounded-xl bg-white/10 text-4xl sm:text-6xl shadow-inner transition-shadow ${
                         isHighlightActive && highlightIndex === idx
-                          ? "ring-4 ring-amber-400 ring-offset-2 ring-offset-white/10 shadow-4xl shadow-amber-400/60"
+                          ? "ring-2 md:ring-4 ring-amber-500 ring-offset-2 ring-offset-white/10 shadow-4xl shadow-amber-400/60 scale-105"
                           : ""
                       }`}
-                      title={animal.name}
+                      title={isRunning ? animal.name : 'Ready'}
                     >
                       <img
-                        src={animal.image}
-                        alt={animal.name}
-                        className="w-4/5 h-4/5 object-contain rounded-lg shadow"
+                        src={isRunning ? animal.image : ImageQuestion}
+                        alt={isRunning ? animal.name : 'Ready'}
+                        className="object-contain rounded-lg shadow"
                         draggable={false}
                       />
                     </div>
