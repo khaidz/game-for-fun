@@ -17,11 +17,18 @@ function App() {
       to: '/games/animal-challenge',
       colors: 'from-amber-500 via-lime-500 to-emerald-500',
     },
+    {
+      id: 'xep-chu',
+      name: 'Xếp chữ',
+      emoji: '🔤',
+      to: '/games/xep-chu',
+      colors: 'from-blue-500 via-purple-500 to-pink-500',
+    },
   ]
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3 md:py-10">
         <header className="flex flex-col items-center text-center gap-4 mb-10">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs sm:text-sm text-slate-200 backdrop-blur">
             <span>🎮 Game For Fun</span>

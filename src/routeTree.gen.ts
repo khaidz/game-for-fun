@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GamesXepChuRouteImport } from './routes/games/xep-chu'
 import { Route as GamesAnimalChallengeRouteImport } from './routes/games/animal-challenge'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesXepChuRoute = GamesXepChuRouteImport.update({
+  id: '/games/xep-chu',
+  path: '/games/xep-chu',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamesAnimalChallengeRoute = GamesAnimalChallengeRouteImport.update({
@@ -26,27 +32,31 @@ const GamesAnimalChallengeRoute = GamesAnimalChallengeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/games/animal-challenge': typeof GamesAnimalChallengeRoute
+  '/games/xep-chu': typeof GamesXepChuRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/games/animal-challenge': typeof GamesAnimalChallengeRoute
+  '/games/xep-chu': typeof GamesXepChuRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/games/animal-challenge': typeof GamesAnimalChallengeRoute
+  '/games/xep-chu': typeof GamesXepChuRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/games/animal-challenge'
+  fullPaths: '/' | '/games/animal-challenge' | '/games/xep-chu'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/games/animal-challenge'
-  id: '__root__' | '/' | '/games/animal-challenge'
+  to: '/' | '/games/animal-challenge' | '/games/xep-chu'
+  id: '__root__' | '/' | '/games/animal-challenge' | '/games/xep-chu'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GamesAnimalChallengeRoute: typeof GamesAnimalChallengeRoute
+  GamesXepChuRoute: typeof GamesXepChuRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/xep-chu': {
+      id: '/games/xep-chu'
+      path: '/games/xep-chu'
+      fullPath: '/games/xep-chu'
+      preLoaderRoute: typeof GamesXepChuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/games/animal-challenge': {
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GamesAnimalChallengeRoute: GamesAnimalChallengeRoute,
+  GamesXepChuRoute: GamesXepChuRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

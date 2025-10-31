@@ -473,7 +473,7 @@ function AnimalChallenge() {
           </div>
         </div>
       )}
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-3 md:py-10">
         <div className="flex items-center justify-between">
           <Link
             to="/"
