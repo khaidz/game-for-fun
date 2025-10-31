@@ -174,7 +174,7 @@ function AnimalChallenge() {
 
   function clearHighlightTimers() {
     if (highlightIntervalRef.current) {
-      window.clearInterval(highlightIntervalRef.current);
+      cancelAnimationFrame(highlightIntervalRef.current);
       highlightIntervalRef.current = null;
     }
     if (highlightTimeoutRef.current) {
@@ -188,6 +188,10 @@ function AnimalChallenge() {
     setHighlightIndex(0);
     // Level 10: interference text handled per tick
     const stepMs = Math.max(1, Math.floor(highlightDurationMs / 8));
+    
+    // Use performance.now() for accurate timing across devices (fixes mobile timer drift)
+    const highlightStartTime = performance.now();
+    
     // helper to (re)generate the hint cloud immediately
     const regenerateHintCloud = () => {
       const pool = getLevelAnimals(currentRound);
@@ -209,7 +213,7 @@ function AnimalChallenge() {
         opacity: number;
         scale: number;
       }>;
-      const count = 15;
+      const count = 20;
       for (let i = 0; i < count; i += 1) {
         const name = pool[Math.floor(Math.random() * pool.length)]?.name ?? "";
         const colorClass = colors[Math.floor(Math.random() * colors.length)];
@@ -236,27 +240,38 @@ function AnimalChallenge() {
     if (currentRound === 10) {
       regenerateHintCloud();
     }
-    if (highlightIntervalRef.current)
-      window.clearInterval(highlightIntervalRef.current);
-    highlightIntervalRef.current = window.setInterval(() => {
-      setHighlightIndex((idx) => {
-        if (idx == null) return 0;
-        // Update hint cloud per tick for level 10
+    // Use requestAnimationFrame with performance.now() for accurate timing across devices
+    let lastIdx = -1;
+    const updateHighlight = () => {
+      const elapsed = performance.now() - highlightStartTime;
+      const currentIdx = Math.min(7, Math.floor(elapsed / stepMs));
+      
+      // Only update state when index changes to avoid unnecessary re-renders
+      if (currentIdx !== lastIdx) {
+        setHighlightIndex(currentIdx);
+        lastIdx = currentIdx;
+        
+        // Update hint cloud per tick (only when index changes) for level 10
         if (currentRound === 10) {
           regenerateHintCloud();
         }
-        if (idx >= 7) {
-          if (highlightIntervalRef.current) {
-            window.clearInterval(highlightIntervalRef.current);
-            highlightIntervalRef.current = null;
-          }
-          setIsHighlightActive(false);
-          setHintCloud([]);
-          return 7;
-        }
-        return idx + 1;
-      });
-    }, stepMs);
+      }
+      
+      // Wait until we've passed the full duration (8 cells * stepMs) before stopping
+      if (elapsed >= highlightDurationMs) {
+        setIsHighlightActive(false);
+        setHintCloud([]);
+        highlightIntervalRef.current = null;
+        return;
+      }
+      
+      highlightIntervalRef.current = requestAnimationFrame(updateHighlight) as unknown as number;
+    };
+    
+    if (highlightIntervalRef.current) {
+      cancelAnimationFrame(highlightIntervalRef.current);
+    }
+    highlightIntervalRef.current = requestAnimationFrame(updateHighlight) as unknown as number;
   }
 
   useEffect(() => {
@@ -302,7 +317,7 @@ function AnimalChallenge() {
       if (roundHighlightScheduleRef.current)
         window.clearTimeout(roundHighlightScheduleRef.current);
       if (highlightIntervalRef.current)
-        window.clearInterval(highlightIntervalRef.current);
+        cancelAnimationFrame(highlightIntervalRef.current);
     };
   }, [currentRound, isFinished, isRunning, roundSchedule]);
 
@@ -401,7 +416,7 @@ function AnimalChallenge() {
           {hintCloud.map((h) => (
             <span
               key={`cloud-overlay-${h.id}`}
-              className={`absolute ${h.colorClass} text-base sm:text-5xl font-extrabold tracking-wide select-none`}
+              className={`absolute ${h.colorClass} text-xl sm:text-5xl font-extrabold tracking-wide select-none`}
               style={{
                 left: `${h.x}%`,
                 top: `${h.y}%`,
