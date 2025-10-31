@@ -9,10 +9,11 @@ import ImageGau from "@/assets/images/animal-challenge/gau.jpg";
 import ImageLon from "@/assets/images/animal-challenge/lon.jpg";
 import ImageMeo from "@/assets/images/animal-challenge/meo.jpg";
 import ImageNgua from "@/assets/images/animal-challenge/ngua.jpg";
-import ImageNhim from "@/assets/images/animal-challenge/nhim.jpg";
+import ImageTom from "@/assets/images/animal-challenge/tom.jpg";
 import ImageRua from "@/assets/images/animal-challenge/rua.jpg";
 import ImageSoc from "@/assets/images/animal-challenge/soc.jpg";
 import ImageVit from "@/assets/images/animal-challenge/vit.jpg";
+import ImageVoi from "@/assets/images/animal-challenge/voi.jpg";
 import ImageQuestion from "@/assets/images/animal-challenge/question.jpg";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -30,11 +31,11 @@ function AnimalChallenge() {
   // Round schedule in seconds (using decimal notation like 6.22 = 6.22s)
   const roundSchedule = useMemo(
     () => [
-      { start: 0.0, end: 6.58, effectStart: 3.96 }, //1
+      { start: 0.0, end: 6.58, effectStart: 4.00 }, //1
       { start: 6.58, end: 11.95, effectStart: 9.2 }, //2
-      { start: 11.95, end: 17.0, effectStart: 14.4 }, //3
+      { start: 11.95, end: 17.0, effectStart: 14.45 }, //3
       { start: 17.0, end: 22.35, effectStart: 19.7 }, //4
-      { start: 22.35, end: 27.41, effectStart: 24.77 }, //5
+      { start: 22.35, end: 27.61, effectStart: 24.97 }, //5
       { start: 27.41, end: 32.6, effectStart: 29.95 }, //6
       { start: 32.6, end: 38.0, effectStart: 35.2 }, //7
       { start: 38.0, end: 43.14, effectStart: 40.4 }, //8
@@ -59,8 +60,9 @@ function AnimalChallenge() {
       { id: "de", name: "De", image: ImageDe },
       { id: "rua", name: "Ruồi", image: ImageRua },
       { id: "vit", name: "Vịt", image: ImageVit },
-      { id: "nhim", name: "Nhím", image: ImageNhim },
+      { id: "tom", name: "Tôm", image: ImageTom },
       { id: "soc", name: "Sóc", image: ImageSoc },
+      { id: "voi", name: "Voi", image: ImageVoi },
     ],
     []
   );
@@ -84,7 +86,8 @@ function AnimalChallenge() {
   const getLevel = (round: number) => {
     if (round <= 3) return "Dễ";
     if (round <= 6) return "Trung bình";
-    return "Khó";
+    if (round <= 9) return "Khó";
+    return "Rất khó";
   };
 
   const getLevelAnimals = (round: number) => {
@@ -102,6 +105,12 @@ function AnimalChallenge() {
   const [currentRound, setCurrentRound] = useState(1);
   const generateGrid = (round = currentRound) => {
     const pool = getLevelAnimals(round);
+    if (round === 10) {
+      // Round 10: 8 unique animals without duplicates
+      const shuffled = [...pool].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, Math.min(8, shuffled.length));
+    }
+    // Rounds 1-9: 8 cells, may repeat
     return Array.from(
       { length: 8 },
       () => pool[Math.floor(Math.random() * pool.length)]
@@ -142,6 +151,7 @@ function AnimalChallenge() {
   useEffect(() => {
     audioRef.current = new Audio(audioUrl);
     audioRef.current.loop = true;
+    audioRef.current.volume = 0.7; // Set volume to 70%
     // Preload audio to avoid delay on first play
     audioRef.current.preload = "auto";
     try {
@@ -206,7 +216,7 @@ function AnimalChallenge() {
         const x = 5 + Math.random() * 90;
         const y = 5 + Math.random() * 90;
         const rotation = -10 + Math.random() * 20;
-        const opacity = 0.35 + Math.random() * 0.4;
+        const opacity = 0.40 + Math.random() * 0.4;
         const scale = 0.85 + Math.random() * 0.5;
         cloud.push({
           id: i,
