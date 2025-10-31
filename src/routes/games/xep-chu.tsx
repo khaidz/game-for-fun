@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 
 export const Route = createFileRoute("/games/xep-chu")({
   component: XepChu,
@@ -33,6 +33,25 @@ function XepChu() {
   const [completedLevels, setCompletedLevels] = useState<Set<number>>(new Set());
   const [levelResults, setLevelResults] = useState<Record<number, 'correct' | 'incorrect' | null>>({});
   const timerRef = useRef<number | null>(null);
+  
+  // Audio URLs
+  const audioUrlCorrect = useMemo(
+    () => new URL("../../assets/music/xepchu-dung.mp3", import.meta.url).href,
+    []
+  );
+  const audioUrlIncorrect = useMemo(
+    () => new URL("../../assets/music/xepchu-sai.mp3", import.meta.url).href,
+    []
+  );
+  const audioUrlCountdown = useMemo(
+    () => new URL("../../assets/music/demnguoc.mp3", import.meta.url).href,
+    []
+  );
+  
+  // Audio refs
+  const audioCorrectRef = useRef<HTMLAudioElement | null>(null);
+  const audioIncorrectRef = useRef<HTMLAudioElement | null>(null);
+  const audioCountdownRef = useRef<HTMLAudioElement | null>(null);
 
   // Lấy thời gian theo level
   const getTimeByLevel = (currentLevel: number): number => {
@@ -63,6 +82,11 @@ function XepChu() {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+    // Dừng nhạc đếm ngược
+    if (audioCountdownRef.current) {
+      audioCountdownRef.current.pause();
+      audioCountdownRef.current.currentTime = 0;
+    }
   };
 
   // Bắt đầu timer
@@ -79,6 +103,15 @@ function XepChu() {
     const time = getTimeByLevel(targetLevel);
     if (time > 0) {
       setTimeLeft(time);
+      
+      // Phát nhạc đếm ngược
+      if (audioCountdownRef.current) {
+        audioCountdownRef.current.currentTime = 0;
+        audioCountdownRef.current.play().catch(() => {
+          // Autoplay may be blocked
+        });
+      }
+      
       timerRef.current = window.setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -121,15 +154,40 @@ function XepChu() {
     }
   };
 
-  // Khởi tạo game lần đầu
+  // Khởi tạo game lần đầu và audio
   useEffect(() => {
     initializeWord();
     
-    // Cleanup timer khi unmount
+    // Khởi tạo audio
+    audioCorrectRef.current = new Audio(audioUrlCorrect);
+    audioCorrectRef.current.volume = 0.7;
+    audioCorrectRef.current.preload = "auto";
+    
+    audioIncorrectRef.current = new Audio(audioUrlIncorrect);
+    audioIncorrectRef.current.volume = 0.7;
+    audioIncorrectRef.current.preload = "auto";
+    
+    audioCountdownRef.current = new Audio(audioUrlCountdown);
+    audioCountdownRef.current.volume = 0.7;
+    audioCountdownRef.current.preload = "auto";
+    
+    // Cleanup timer và audio khi unmount
     return () => {
       stopTimer();
+      if (audioCorrectRef.current) {
+        audioCorrectRef.current.pause();
+        audioCorrectRef.current = null;
+      }
+      if (audioIncorrectRef.current) {
+        audioIncorrectRef.current.pause();
+        audioIncorrectRef.current = null;
+      }
+      if (audioCountdownRef.current) {
+        audioCountdownRef.current.pause();
+        audioCountdownRef.current = null;
+      }
     };
-  }, []);
+  }, [audioUrlCorrect, audioUrlIncorrect, audioUrlCountdown]);
 
   // Kiểm tra level có được unlock không
   const isLevelUnlocked = (lvl: number) => {
@@ -165,6 +223,19 @@ function XepChu() {
     stopTimer();
     setIsTimeUp(false);
     setTimeLeft(0);
+    
+    // Phát nhạc báo
+    if (isCorrect && audioCorrectRef.current) {
+      audioCorrectRef.current.currentTime = 0;
+      audioCorrectRef.current.play().catch(() => {
+        // Autoplay may be blocked
+      });
+    } else if (!isCorrect && audioIncorrectRef.current) {
+      audioIncorrectRef.current.currentTime = 0;
+      audioIncorrectRef.current.play().catch(() => {
+        // Autoplay may be blocked
+      });
+    }
   };
 
   // Chuyển sang từ tiếp theo (chỉ khi đã hoàn thành level hiện tại)
@@ -210,6 +281,15 @@ function XepChu() {
     const time = getTimeByLevel(1);
     if (time > 0) {
       setTimeLeft(time);
+      
+      // Phát nhạc đếm ngược
+      if (audioCountdownRef.current) {
+        audioCountdownRef.current.currentTime = 0;
+        audioCountdownRef.current.play().catch(() => {
+          // Autoplay may be blocked
+        });
+      }
+      
       timerRef.current = window.setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -447,7 +527,7 @@ function XepChu() {
                               </span>
                             )}
                           </p>
-                          <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 px-2 break-words ${
+                          <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 px-2 wrap-break-word ${
                             isCorrect 
                               ? "text-emerald-200" 
                               : isIncorrect 
