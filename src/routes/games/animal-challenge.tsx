@@ -11,7 +11,7 @@ import ImageMeo from "@/assets/images/animal-challenge/meo.jpg";
 import ImageNgua from "@/assets/images/animal-challenge/ngua.jpg";
 import ImageTom from "@/assets/images/animal-challenge/tom.jpg";
 import ImageRua from "@/assets/images/animal-challenge/rua.jpg";
-import ImageSoc from "@/assets/images/animal-challenge/soc.jpg";
+import ImageRan from "@/assets/images/animal-challenge/ran.jpg";
 import ImageVit from "@/assets/images/animal-challenge/vit.jpg";
 import ImageVoi from "@/assets/images/animal-challenge/voi.jpg";
 import ImageQuestion from "@/assets/images/animal-challenge/question.jpg";
@@ -36,7 +36,7 @@ function AnimalChallenge() {
       { start: 11.95, end: 17.0, effectStart: 14.45 }, //3
       { start: 17.0, end: 22.35, effectStart: 19.7 }, //4
       { start: 22.35, end: 27.61, effectStart: 24.97 }, //5
-      { start: 27.41, end: 32.6, effectStart: 29.95 }, //6
+      { start: 27.61, end: 32.6, effectStart: 29.95 }, //6
       { start: 32.6, end: 38.0, effectStart: 35.2 }, //7
       { start: 38.0, end: 43.14, effectStart: 40.4 }, //8
       { start: 43.14, end: 48.3, effectStart: 45.6 }, //9
@@ -92,7 +92,7 @@ function AnimalChallenge() {
       { id: "rua", name: "Ruồi", image: ImageRua },
       { id: "vit", name: "Vịt", image: ImageVit },
       { id: "tom", name: "Tôm", image: ImageTom },
-      { id: "soc", name: "Sóc", image: ImageSoc },
+      { id: "ran", name: "Rắn", image: ImageRan },
       { id: "voi", name: "Voi", image: ImageVoi },
     ],
     []
