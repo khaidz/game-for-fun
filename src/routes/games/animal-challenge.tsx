@@ -32,15 +32,15 @@ function AnimalChallenge() {
   const baseRoundSchedule = useMemo(
     () => [
       { start: 0.0, end: 6.58, effectStart: 4.00 }, //1
-      { start: 6.58, end: 11.95, effectStart: 9.2 }, //2
-      { start: 11.95, end: 17.0, effectStart: 14.45 }, //3
+      { start: 6.58, end: 11.95, effectStart: 9.3 }, //2
+      { start: 11.95, end: 17.0, effectStart: 14.5 }, //3
       { start: 17.0, end: 22.35, effectStart: 19.7 }, //4
       { start: 22.35, end: 27.61, effectStart: 24.97 }, //5
-      { start: 27.61, end: 32.6, effectStart: 29.95 }, //6
-      { start: 32.6, end: 38.0, effectStart: 35.2 }, //7
-      { start: 38.0, end: 43.14, effectStart: 40.4 }, //8
-      { start: 43.14, end: 48.3, effectStart: 45.6 }, //9
-      { start: 48.3, end: 54.0, effectStart: 50.9 }, //10
+      { start: 27.61, end: 32.7, effectStart: 30.15 }, //6
+      { start: 32.7, end: 38.0, effectStart: 35.4 }, //7
+      { start: 38.0, end: 43.24, effectStart: 40.6 }, //8
+      { start: 43.24, end: 48.5, effectStart: 45.8 }, //9
+      { start: 48.5, end: 54.0, effectStart: 50.9 }, //10
     ],
     []
   );
