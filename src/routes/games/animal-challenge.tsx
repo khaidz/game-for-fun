@@ -28,8 +28,8 @@ function AnimalChallenge() {
   }, []);
   const totalRounds = 10;
   const highlightDurationMs = 2640;
-  // Round schedule in seconds (using decimal notation like 6.22 = 6.22s)
-  const roundSchedule = useMemo(
+  // Base round schedule in seconds (using decimal notation like 6.22 = 6.22s)
+  const baseRoundSchedule = useMemo(
     () => [
       { start: 0.0, end: 6.58, effectStart: 4.00 }, //1
       { start: 6.58, end: 11.95, effectStart: 9.2 }, //2
@@ -44,6 +44,37 @@ function AnimalChallenge() {
     ],
     []
   );
+
+  // State for delay adjustment
+  const [delayAdjustment, setDelayAdjustment] = useState(0);
+  const [delayInputValue, setDelayInputValue] = useState('');
+  const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
+
+  // Calculate adjusted round schedule based on delay
+  const roundSchedule = useMemo(() => {
+    if (delayAdjustment === 0) return baseRoundSchedule;
+
+    const adjusted: typeof baseRoundSchedule = [];
+    for (let i = 0; i < baseRoundSchedule.length; i++) {
+      const base = baseRoundSchedule[i];
+      if (i === 0) {
+        // First round: start stays the same, end and effectStart add delay
+        adjusted.push({
+          start: base.start,
+          end: base.end + delayAdjustment,
+          effectStart: base.effectStart + delayAdjustment,
+        });
+      } else {
+        // Subsequent rounds: start = previous round's end, end and effectStart add delay
+        adjusted.push({
+          start: adjusted[i - 1].end,
+          end: base.end + delayAdjustment,
+          effectStart: base.effectStart + delayAdjustment,
+        });
+      }
+    }
+    return adjusted;
+  }, [baseRoundSchedule, delayAdjustment]);
 
   const animals = useMemo(
     () => [
@@ -140,6 +171,7 @@ function AnimalChallenge() {
   const highlightTimeoutRef = useRef<number | null>(null);
   const roundHighlightScheduleRef = useRef<number | null>(null);
   const gridSectionRef = useRef<HTMLDivElement | null>(null);
+  const notificationTimeoutRef = useRef<number | null>(null);
 
   // Resolve audio URL via Vite so it works from src/assets
   const audioUrl = useMemo(
@@ -166,6 +198,9 @@ function AnimalChallenge() {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
+      }
+      if (notificationTimeoutRef.current) {
+        window.clearTimeout(notificationTimeoutRef.current);
       }
     };
   }, [audioUrl]);
@@ -430,6 +465,14 @@ function AnimalChallenge() {
           ))}
         </div>
       ) : null}
+      {/* Notification toast */}
+      {notificationMessage && (
+        <div className="fixed top-4 right-4 z-30 transition-all duration-300 ease-in-out">
+          <div className="rounded-lg border border-emerald-500/50 bg-emerald-500/20 backdrop-blur-sm px-4 py-2 text-sm font-medium text-emerald-200 shadow-lg">
+            {notificationMessage}
+          </div>
+        </div>
+      )}
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center justify-between">
           <Link
@@ -438,8 +481,58 @@ function AnimalChallenge() {
           >
             ← Trang chủ
           </Link>
-          <div className="text-sm text-slate-300">
-            {currentRound}/{totalRounds}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                step="0.01"
+                placeholder="Delay"
+                value={delayInputValue}
+                onChange={(e) => {
+                  setDelayInputValue(e.target.value);
+                }}
+                className="w-20 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-sm text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  // Clear any existing notification timeout
+                  if (notificationTimeoutRef.current) {
+                    window.clearTimeout(notificationTimeoutRef.current);
+                  }
+                  
+                  const val = parseFloat(delayInputValue);
+                  if (!isNaN(val)) {
+                    setDelayAdjustment(val);
+                    // Stop the game when setting delay
+                    handleStop();
+                    // Show notification
+                    const sign = val >= 0 ? '+' : '';
+                    setNotificationMessage(`Đã set delay: ${sign}${val}s`);
+                    // Clear notification after 3 seconds
+                    notificationTimeoutRef.current = window.setTimeout(() => {
+                      setNotificationMessage(null);
+                      notificationTimeoutRef.current = null;
+                    }, 3000);
+                  } else {
+                    setDelayAdjustment(0);
+                    setDelayInputValue('');
+                    // Stop the game
+                    handleStop();
+                    // Show notification
+                    setNotificationMessage('Đã reset delay về 0');
+                    // Clear notification after 3 seconds
+                    notificationTimeoutRef.current = window.setTimeout(() => {
+                      setNotificationMessage(null);
+                      notificationTimeoutRef.current = null;
+                    }, 3000);
+                  }
+                }}
+                className="rounded-lg border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              >
+                Set
+              </button>
+            </div>
           </div>
         </div>
 
