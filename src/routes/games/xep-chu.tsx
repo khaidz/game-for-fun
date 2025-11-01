@@ -273,20 +273,19 @@ function XepChu() {
     let word = getRandomWord(targetLevel);
     let displayWord = word;
     
-    // Màn 1,2,3: uppercase theo đúng từ gốc
-    if (targetLevel >= 4 && targetLevel <= 6) {
+    if (targetLevel === 3 || targetLevel === 4) {
       displayWord = word.toLowerCase();
     }
-    // Màn 7,8: uppercase hết
-    else if (targetLevel >= 7 && targetLevel <= 8) {
+    // Màn 5,6: uppercase hết
+    else if (targetLevel ===5 || targetLevel === 6) {
       displayWord = word.toUpperCase();
     }
-    // Màn 9: bỏ dấu
-    else if (targetLevel === 9) {
+    // Màn 7,8: bỏ dấu
+    else if (targetLevel === 7 || targetLevel === 8) {
       displayWord = removeVietnameseDiacritics(word);
     }
-    // Màn 10: bỏ dấu + randomize uppercase/lowercase
-    else if (targetLevel === 10) {
+    // Màn 9,10: bỏ dấu + randomize uppercase/lowercase
+    else if (targetLevel === 9 || targetLevel === 10) {
       displayWord = randomizeCase(removeVietnameseDiacritics(word));
     }
     
