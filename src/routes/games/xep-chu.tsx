@@ -1,23 +1,108 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/games/xep-chu")({
   component: XepChu,
 });
 
 // Danh sách từ cho 10 level
-const wordsByLevel: Record<number, string[]> = {
-  1: ["mèo", "chó", "gà", "bò", "cá", "hoa", "nhà", "cây", "mặt", "sông"],
-  2: ["bàn", "ghế", "cửa", "tường", "nền", "mái", "vườn", "ao", "biển", "núi"],
-  3: ["thành phố", "động vật", "trái cây", "mặt trời", "sách vở"],
-  4: ["trường học", "đồng hồ", "bức tranh", "câu chuyện", "bữa ăn"],
-  5: ["giáo dục", "khoa học", "nghệ thuật", "phương tiện", "công nghệ"],
-  6: ["du lịch", "thể thao", "âm nhạc", "văn học", "kinh tế"],
-  7: ["truyền thông", "môi trường", "xã hội", "văn hóa", "lịch sử"],
-  8: ["công nghiệp", "nông nghiệp", "thương mại", "tài chính", "ngân hàng"],
-  9: ["kiến trúc", "xây dựng", "giao thông", "viễn thông", "năng lượng"],
-  10: ["quốc tế", "ngoại giao", "an ninh", "pháp luật", "tư pháp"],
+// Hàm capitalize chữ cái đầu của mỗi từ
+const capitalizeWords = (str: string): string => {
+  return str
+    .split(" ")
+    .map((word) => {
+      if (word.length === 0) return word;
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
 };
+
+const wordsByLevelRaw: Record<number, string[]> = {
+  1: [
+    "con mèo", "con chó", "con gà", "con cá", "con trâu", "con bò", "con vịt", "con chim", "con chuột", "con dê",
+    "cái bàn", "cái ghế", "cái nồi", "cái bát", "cái chén", "cái cốc", "cái muỗng", "cái kéo", "cái thước", "cái đèn",
+    "ngôi nhà", "khu vườn", "bờ sông", "ngọn núi", "dòng suối", "bầu trời", "mặt trời", "mặt trăng", "đám mây", "cánh đồng",
+    "bông hoa", "trái cây", "bát cơm", "ly nước", "nồi canh", "bức tranh", "quyển sách", "tờ báo", "cây bút", "chiếc áo",
+    "đôi dép", "đôi giày", "chiếc mũ", "bức tranh", "chiếc gối", "cái quạt", "tivi", "điện thoại", "máy tính", "xe đạp"
+  ],
+  2: [
+    "ngôi trường", "phòng học", "bảng đen", "cây phấn", "quyển vở", "bút chì", "bút mực", "bàn giáo viên", "sân trường", "giờ học",
+    "ngôi chợ", "quầy hàng", "sạp rau", "cửa hàng", "nhà bếp", "bữa cơm", "bát phở", "đĩa cơm", "nồi cơm", "ly cà phê",
+    "con đường", "cây cầu", "hàng cây", "ngôi đình", "lũy tre", "giếng nước", "cánh diều", "ánh đèn", "bóng đèn", "âm thanh",
+    "mùa xuân", "mùa hè", "mùa thu", "mùa đông", "ngày lễ", "buổi sáng", "buổi tối", "bữa sáng", "bữa tối", "bữa trưa",
+    "đôi mắt", "bàn tay", "khuôn mặt", "nụ cười", "tiếng cười", "ngôi làng", "con phố", "góc phố", "khu chợ", "nhà sàn"
+  ],
+  3: [
+    "thành phố", "nhà cao", "xe buýt", "ga tàu", "trạm xe", "siêu thị", "quán cà phê", "nhà hàng", "công viên", "bãi biển",
+    "khu phố", "chung cư", "tòa nhà", "khu nghỉ", "khách sạn", "hướng dẫn", "sân bay", "phòng chờ", "bến xe", "đèn đường",
+    "điện thoại", "máy ảnh", "máy tính", "nghênh ngang", "mạng xã hội", "ứng dụng", "tin nhắn", "email", "phần mềm", "trò chơi",
+    "video trực tuyến", "màn hình", "âm nhạc", "thẻ ngân hàng", "máy rút", "hóa đơn", "tài khoản", "mật khẩu", "giao dịch", "mã QR",
+    "cửa hàng", "sản phẩm", "đơn hàng", "vận chuyển", "giao hàng", "kho hàng", "nhân viên", "khách hàng", "dịch vụ", "chính sách"
+  ],
+  4: [
+    "buổi họp", "kế hoạch", "lịch trình", "báo cáo", "dự án", "phòng họp", "văn phòng", "máy in", "máy fax", "giấy tờ",
+    "quản lý", "nhân sự", "cấp trên", "đồng nghiệp", "thư ký", "công ty", "chi nhánh", "trụ sở", "hợp đồng", "chữ ký",
+    "sản phẩm", "nhãn hiệu", "quảng cáo", "doanh thu", "lợi nhuận", "chi phí", "giá vốn", "thị trường", "người tiêu dùng", "bảng giá",
+    "cuộc họp", "bản tin", "thông báo", "biên bản", "tài liệu", "phòng ban", "bộ phận", "kế toán", "pháp nhân", "ngân quỹ",
+    "máy in", "máy photo", "bàn làm việc", "máy lạnh", "hồ sơ", "bìa hồ sơ", "giấy phép", "con dấu", "hóa đơn", "phiếu thu"
+  ],
+  5: [
+    "trường đại học", "giảng viên", "sinh viên", "thư viện", "phòng thí nghiệm", "giáo trình", "môn học", "bài giảng", "kỳ thi", "bằng cấp",
+    "nghiên cứu", "đề tài", "kết quả", "số liệu", "thống kê", "dữ liệu", "bảng biểu", "biểu đồ", "mẫu vật", "học bổng",
+    "giáo dục", "đào tạo", "chương trình", "bài tập", "trường lớp", "học kỳ", "giáo án", "thi cử", "bảng điểm", "học sinh",
+    "bệnh viện", "bác sĩ", "y tá", "bệnh nhân", "phòng khám", "thuốc men", "giường bệnh", "sức khỏe", "dịch bệnh", "vắc xin",
+    "chăm sóc", "khẩu trang", "nhiệt kế", "máy đo", "máu huyết", "tim mạch", "hô hấp", "não bộ", "xương khớp", "hệ thần kinh"
+  ],
+  6: [
+    "du khách", "hướng dẫn viên", "địa điểm", "bản đồ", "vé máy bay", "sân bay", "khu du lịch", "phòng khách", "khách sạn", "nhà nghỉ",
+    "bữa sáng", "nhà hàng", "thực đơn", "đồ uống", "đặc sản", "hóa đơn", "tiền mặt", "thẻ tín dụng", "máy tính bảng", "máy ảnh số",
+    "thời tiết", "nhiệt độ", "bầu không khí", "gió mùa", "biển xanh", "núi rừng", "sông suối", "đảo nhỏ", "vùng biển", "khu sinh thái",
+    "văn hóa", "truyền thống", "phong tục", "tập quán", "lễ hội", "trang phục", "ẩm thực", "nghệ thuật", "di sản", "danh lam",
+    "bảo tàng", "nhà hát", "sân khấu", "bức tượng", "bức tranh", "kiến trúc", "công trình", "cổng thành", "điện thờ", "ngôi đền"
+  ],
+  7: [
+    "nền kinh tế", "thị trường", "ngân hàng", "tài chính", "đầu tư", "doanh nghiệp", "cổ phiếu", "lợi nhuận", "vốn điều lệ", "thuế suất",
+    "bộ luật", "hệ thống", "chính sách", "cơ quan", "người dân", "chính phủ", "quốc hội", "hội đồng", "ủy ban", "văn bản",
+    "báo cáo", "thống kê", "kết quả", "chỉ số", "tăng trưởng", "sản lượng", "doanh thu", "ngân sách", "chi tiêu", "xuất khẩu",
+    "truyền thông", "báo chí", "phóng viên", "tin tức", "trang mạng", "phản hồi", "thông tin", "quảng bá", "diễn đàn", "bài viết",
+    "môi trường", "khí hậu", "rừng cây", "nguồn nước", "chất thải", "năng lượng", "tái chế", "ô nhiễm", "bảo tồn", "thiên nhiên"
+  ],
+  8: [
+    "công nghiệp", "nông nghiệp", "lâm nghiệp", "thủy sản", "chăn nuôi", "trồng trọt", "nhà máy", "xí nghiệp", "dây chuyền", "khu công nghiệp",
+    "công nhân", "kỹ sư", "quản đốc", "máy móc", "thiết bị", "công nghệ", "robot tự động", "sản phẩm", "nguyên liệu", "vật liệu",
+    "thương mại", "xuất khẩu", "nhập khẩu", "vận tải", "giao nhận", "hóa đơn", "đơn hàng", "hợp đồng", "kho bãi", "giao dịch",
+    "tài chính", "ngân hàng", "chứng khoán", "cổ phần", "trái phiếu", "quỹ đầu tư", "tín dụng", "bảo hiểm", "doanh thu", "lợi nhuận",
+    "kế toán", "kiểm toán", "ngân sách", "chi phí", "giá trị", "thị phần", "tăng trưởng", "đổi mới", "hiệu quả", "chiến lược"
+  ],
+  9: [
+    "công trình", "kiến trúc", "xây dựng", "thiết kế", "vật liệu", "bản vẽ", "kỹ sư", "giám sát", "nhà thầu", "công trường",
+    "giao thông", "đường bộ", "đường sắt", "đường thủy", "đường hàng không", "xe container", "cầu vượt", "hầm đường", "biển báo", "tín hiệu",
+    "năng lượng", "điện gió", "điện mặt trời", "nhiên liệu", "trạm điện", "máy phát", "điện áp", "công suất", "lưới điện", "pin lưu trữ",
+    "viễn thông", "trạm phát", "vệ tinh", "tín hiệu", "mạng cáp", "thiết bị", "điện thoại", "máy chủ", "máy tính", "dữ liệu",
+    "an ninh", "phòng cháy", "cứu hộ", "bảo vệ", "kiểm tra", "giấy phép", "quy chuẩn", "an toàn", "giám định", "chứng nhận"
+  ],
+  10: [
+    "ngôi nhà nhỏ", "bữa ăn sáng", "chuyến xe bus", "bữa tiệc nhỏ", "bộ bàn ghế",
+    "phòng khách lớn", "chiếc xe máy", "người bạn thân", "tấm ảnh cũ", "bức tường trắng",
+    "cửa sổ kính", "khu vườn nhỏ", "bãi biển đẹp", "ly cà phê", "tủ quần áo",
+    "đèn bàn học", "sân chơi trẻ", "giỏ hoa tươi", "chậu cây cảnh", "món ăn ngon",
+    "bộ quần áo", "tòa nhà cao", "bữa cơm tối", "ngôi trường làng", "bến xe buýt",
+    "công viên xanh", "bộ phim hay", "cuốn sách mới", "gian bếp nhỏ", "bức tranh treo",
+    "tủ lạnh lớn", "chiếc giày mới", "sân thượng rộng", "điện thoại cũ", "chiếc cặp sách",
+    "tấm gương soi", "đĩa trái cây", "món quà nhỏ", "chiếc balo đen", "bộ ấm chén",
+    "phòng ngủ nhỏ", "ly nước cam", "chiếc nồi cơm", "bộ đồ ăn", "kệ sách gỗ",
+    "cây đàn piano", "chậu hoa lan", "đèn trần sáng", "chiếc ghế gỗ", "người hàng xóm"
+  ]
+};
+
+
+// Áp dụng capitalize cho tất cả các từ
+const wordsByLevel: Record<number, string[]> = Object.fromEntries(
+  Object.entries(wordsByLevelRaw).map(([level, words]) => [
+    level,
+    words.map(capitalizeWords),
+  ])
+) as Record<number, string[]>;
 
 function XepChu() {
   useEffect(() => {
@@ -78,6 +163,26 @@ function XepChu() {
     const wordList = wordsByLevel[currentLevel] || wordsByLevel[1];
     const randomIndex = Math.floor(Math.random() * wordList.length);
     return wordList[randomIndex];
+  };
+
+  // Bỏ dấu tiếng Việt
+  const removeVietnameseDiacritics = (str: string): string => {
+    return str
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/đ/g, "d")
+      .replace(/Đ/g, "D");
+  };
+
+  // Randomize uppercase/lowercase
+  const randomizeCase = (str: string): string => {
+    return str
+      .split("")
+      .map((char) => {
+        if (char === " ") return char;
+        return Math.random() < 0.5 ? char.toUpperCase() : char.toLowerCase();
+      })
+      .join("");
   };
 
   // Xáo trộn chữ cái
@@ -165,9 +270,28 @@ function XepChu() {
   // Khởi tạo từ mới
   const initializeWord = (newLevel?: number) => {
     const targetLevel = newLevel !== undefined ? newLevel : level;
-    const word = getRandomWord(targetLevel);
-    setCurrentWord(word);
-    setShuffledLetters(word ? shuffleLetters(word) : []);
+    let word = getRandomWord(targetLevel);
+    let displayWord = word;
+    
+    // Màn 1,2,3: uppercase theo đúng từ gốc
+    if (targetLevel >= 4 && targetLevel <= 6) {
+      displayWord = word.toLowerCase();
+    }
+    // Màn 7,8: uppercase hết
+    else if (targetLevel >= 7 && targetLevel <= 8) {
+      displayWord = word.toUpperCase();
+    }
+    // Màn 9: bỏ dấu
+    else if (targetLevel === 9) {
+      displayWord = removeVietnameseDiacritics(word);
+    }
+    // Màn 10: bỏ dấu + randomize uppercase/lowercase
+    else if (targetLevel === 10) {
+      displayWord = randomizeCase(removeVietnameseDiacritics(word));
+    }
+    
+    setCurrentWord(word); // Lưu từ gốc để hiển thị đáp án
+    setShuffledLetters(displayWord ? shuffleLetters(displayWord) : []);
     
     // Nếu level đã hoàn thành, hiển thị đáp án ngay
     if (completedLevels.has(targetLevel)) {
@@ -620,7 +744,7 @@ function XepChu() {
                           key={`${letter}-${index}`}
                           className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-lg sm:text-xl md:text-2xl font-bold rounded-lg sm:rounded-xl bg-linear-to-br from-blue-500/20 to-purple-500/20 border-2 border-blue-400/30 text-blue-200 shadow-lg transition-all duration-500"
                         >
-                          {letter.toUpperCase()}
+                          {letter}
                         </span>
                       ))}
                     </div>
