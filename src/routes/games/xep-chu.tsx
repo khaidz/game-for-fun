@@ -51,12 +51,17 @@ function XepChu() {
     () => new URL("../../assets/music/5s-remaining.mp3", import.meta.url).href,
     []
   );
+  const audioUrlMagic = useMemo(
+    () => new URL("../../assets/music/magic.mp3", import.meta.url).href,
+    []
+  );
   
   // Audio refs
   const audioCorrectRef = useRef<HTMLAudioElement | null>(null);
   const audioIncorrectRef = useRef<HTMLAudioElement | null>(null);
   const audioCountdownRef = useRef<HTMLAudioElement | null>(null);
   const audio5sRemainingRef = useRef<HTMLAudioElement | null>(null);
+  const audioMagicRef = useRef<HTMLAudioElement | null>(null);
 
   // Lấy thời gian theo level
   const getTimeByLevel = (currentLevel: number): number => {
@@ -208,6 +213,11 @@ function XepChu() {
       audio5sRemainingRef.current.volume = 0.7;
       audio5sRemainingRef.current.preload = "auto";
       
+      // Load nhạc magic
+      audioMagicRef.current = new Audio(audioUrlMagic);
+      audioMagicRef.current.volume = 0.7;
+      audioMagicRef.current.preload = "auto";
+      
       // Force load tất cả audio để tránh delay khi phát
       const loadPromises = [
         new Promise<void>((resolve) => {
@@ -242,6 +252,14 @@ function XepChu() {
             resolve();
           }
         }),
+        new Promise<void>((resolve) => {
+          if (audioMagicRef.current) {
+            audioMagicRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioMagicRef.current.load();
+          } else {
+            resolve();
+          }
+        }),
       ];
       
       // Đợi tất cả audio load xong (với timeout để không block quá lâu)
@@ -272,8 +290,12 @@ function XepChu() {
         audio5sRemainingRef.current.pause();
         audio5sRemainingRef.current = null;
       }
+      if (audioMagicRef.current) {
+        audioMagicRef.current.pause();
+        audioMagicRef.current = null;
+      }
     };
-  }, [audioUrlCorrect, audioUrlIncorrect, audioUrlCountdown, audioUrl5sRemaining]);
+  }, [audioUrlCorrect, audioUrlIncorrect, audioUrlCountdown, audioUrl5sRemaining, audioUrlMagic]);
 
   // Kiểm tra level có được unlock không
   const isLevelUnlocked = (lvl: number) => {
@@ -302,6 +324,14 @@ function XepChu() {
     // Dừng timer và nhạc đếm ngược
     stopTimer();
     setIsTimeUp(false);
+    
+    // Phát nhạc magic
+    if (audioMagicRef.current) {
+      audioMagicRef.current.currentTime = 0;
+      audioMagicRef.current.play().catch(() => {
+        // Autoplay may be blocked
+      });
+    }
   };
 
   // Đánh dấu đáp án đúng/sai
