@@ -131,8 +131,8 @@ function XepChu() {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
           
-          // Khi còn 5 giây, chuyển sang nhạc 5s-remaining
-          if (prev === 6 && newTime === 5) {
+          // Khi còn 4 giây, chuyển sang nhạc 5s-remaining
+          if (prev === 5 && newTime === 4) {
             // Dừng nhạc đếm ngược
             if (audioCountdownRef.current) {
               audioCountdownRef.current.pause();
@@ -414,8 +414,8 @@ function XepChu() {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
           
-          // Khi còn 5 giây, chuyển sang nhạc 5s-remaining
-          if (prev === 6 && newTime === 5) {
+          // Khi còn 4 giây, chuyển sang nhạc 5s-remaining
+          if (prev === 5 && newTime === 4) {
             // Dừng nhạc đếm ngược
             if (audioCountdownRef.current) {
               audioCountdownRef.current.pause();
