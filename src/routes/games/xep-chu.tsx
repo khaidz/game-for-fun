@@ -47,11 +47,16 @@ function XepChu() {
     () => new URL("../../assets/music/demnguoc.mp3", import.meta.url).href,
     []
   );
+  const audioUrl5sRemaining = useMemo(
+    () => new URL("../../assets/music/5s-remaining.mp3", import.meta.url).href,
+    []
+  );
   
   // Audio refs
   const audioCorrectRef = useRef<HTMLAudioElement | null>(null);
   const audioIncorrectRef = useRef<HTMLAudioElement | null>(null);
   const audioCountdownRef = useRef<HTMLAudioElement | null>(null);
+  const audio5sRemainingRef = useRef<HTMLAudioElement | null>(null);
 
   // Lấy thời gian theo level
   const getTimeByLevel = (currentLevel: number): number => {
@@ -87,6 +92,11 @@ function XepChu() {
       audioCountdownRef.current.pause();
       audioCountdownRef.current.currentTime = 0;
     }
+    // Dừng nhạc 5s còn lại
+    if (audio5sRemainingRef.current) {
+      audio5sRemainingRef.current.pause();
+      audio5sRemainingRef.current.currentTime = 0;
+    }
   };
 
   // Bắt đầu timer
@@ -114,13 +124,31 @@ function XepChu() {
       
       timerRef.current = window.setInterval(() => {
         setTimeLeft((prev) => {
-          if (prev <= 1) {
+          const newTime = prev - 1;
+          
+          // Khi còn 5 giây, chuyển sang nhạc 5s-remaining
+          if (prev === 6 && newTime === 5) {
+            // Dừng nhạc đếm ngược
+            if (audioCountdownRef.current) {
+              audioCountdownRef.current.pause();
+              audioCountdownRef.current.currentTime = 0;
+            }
+            // Phát nhạc 5s-remaining
+            if (audio5sRemainingRef.current) {
+              audio5sRemainingRef.current.currentTime = 0;
+              audio5sRemainingRef.current.play().catch(() => {
+                // Autoplay may be blocked
+              });
+            }
+          }
+          
+          if (newTime <= 0) {
             stopTimer();
             // Hiển thị "Time up" khi hết thời gian
             setIsTimeUp(true);
             return 0;
           }
-          return prev - 1;
+          return newTime;
         });
       }, 1000);
     } else {
@@ -158,18 +186,72 @@ function XepChu() {
   useEffect(() => {
     initializeWord();
     
-    // Khởi tạo audio
-    audioCorrectRef.current = new Audio(audioUrlCorrect);
-    audioCorrectRef.current.volume = 0.7;
-    audioCorrectRef.current.preload = "auto";
+    // Khởi tạo và preload tất cả audio
+    const loadAudios = async () => {
+      // Load nhạc đúng
+      audioCorrectRef.current = new Audio(audioUrlCorrect);
+      audioCorrectRef.current.volume = 0.7;
+      audioCorrectRef.current.preload = "auto";
+      
+      // Load nhạc sai
+      audioIncorrectRef.current = new Audio(audioUrlIncorrect);
+      audioIncorrectRef.current.volume = 0.5;
+      audioIncorrectRef.current.preload = "auto";
+      
+      // Load nhạc đếm ngược
+      audioCountdownRef.current = new Audio(audioUrlCountdown);
+      audioCountdownRef.current.volume = 0.7;
+      audioCountdownRef.current.preload = "auto";
+      
+      // Load nhạc 5s còn lại
+      audio5sRemainingRef.current = new Audio(audioUrl5sRemaining);
+      audio5sRemainingRef.current.volume = 0.7;
+      audio5sRemainingRef.current.preload = "auto";
+      
+      // Force load tất cả audio để tránh delay khi phát
+      const loadPromises = [
+        new Promise<void>((resolve) => {
+          if (audioCorrectRef.current) {
+            audioCorrectRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioCorrectRef.current.load();
+          } else {
+            resolve();
+          }
+        }),
+        new Promise<void>((resolve) => {
+          if (audioIncorrectRef.current) {
+            audioIncorrectRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioIncorrectRef.current.load();
+          } else {
+            resolve();
+          }
+        }),
+        new Promise<void>((resolve) => {
+          if (audioCountdownRef.current) {
+            audioCountdownRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioCountdownRef.current.load();
+          } else {
+            resolve();
+          }
+        }),
+        new Promise<void>((resolve) => {
+          if (audio5sRemainingRef.current) {
+            audio5sRemainingRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audio5sRemainingRef.current.load();
+          } else {
+            resolve();
+          }
+        }),
+      ];
+      
+      // Đợi tất cả audio load xong (với timeout để không block quá lâu)
+      await Promise.race([
+        Promise.all(loadPromises),
+        new Promise(resolve => setTimeout(resolve, 5000)), // Timeout 5s
+      ]);
+    };
     
-    audioIncorrectRef.current = new Audio(audioUrlIncorrect);
-    audioIncorrectRef.current.volume = 0.7;
-    audioIncorrectRef.current.preload = "auto";
-    
-    audioCountdownRef.current = new Audio(audioUrlCountdown);
-    audioCountdownRef.current.volume = 0.7;
-    audioCountdownRef.current.preload = "auto";
+    loadAudios();
     
     // Cleanup timer và audio khi unmount
     return () => {
@@ -186,8 +268,12 @@ function XepChu() {
         audioCountdownRef.current.pause();
         audioCountdownRef.current = null;
       }
+      if (audio5sRemainingRef.current) {
+        audio5sRemainingRef.current.pause();
+        audio5sRemainingRef.current = null;
+      }
     };
-  }, [audioUrlCorrect, audioUrlIncorrect, audioUrlCountdown]);
+  }, [audioUrlCorrect, audioUrlIncorrect, audioUrlCountdown, audioUrl5sRemaining]);
 
   // Kiểm tra level có được unlock không
   const isLevelUnlocked = (lvl: number) => {
@@ -210,6 +296,14 @@ function XepChu() {
     initializeWord(newLevel);
   };
 
+  // Hiển thị đáp án
+  const handleShowAnswer = () => {
+    setShowAnswer(true);
+    // Dừng timer và nhạc đếm ngược
+    stopTimer();
+    setIsTimeUp(false);
+  };
+
   // Đánh dấu đáp án đúng/sai
   const markAnswer = (isCorrect: boolean) => {
     const result = isCorrect ? 'correct' : 'incorrect';
@@ -219,12 +313,13 @@ function XepChu() {
     }));
     setCompletedLevels(prev => new Set(prev).add(level));
     setShowAnswer(true);
-    // Dừng timer và reset states
+    
+    // Dừng timer và nhạc đếm ngược trước khi phát nhạc đúng/sai
     stopTimer();
     setIsTimeUp(false);
     setTimeLeft(0);
     
-    // Phát nhạc báo
+    // Phát nhạc báo (sau khi đã dừng nhạc đếm ngược)
     if (isCorrect && audioCorrectRef.current) {
       audioCorrectRef.current.currentTime = 0;
       audioCorrectRef.current.play().catch(() => {
@@ -249,11 +344,6 @@ function XepChu() {
       setLevel(nextLevel);
       initializeWord(nextLevel);
     }
-  };
-
-  // Chơi lại từ hiện tại
-  const handleReset = () => {
-    initializeWord();
   };
 
   // Reset toàn bộ và bắt đầu từ level 1
@@ -292,12 +382,30 @@ function XepChu() {
       
       timerRef.current = window.setInterval(() => {
         setTimeLeft((prev) => {
-          if (prev <= 1) {
+          const newTime = prev - 1;
+          
+          // Khi còn 5 giây, chuyển sang nhạc 5s-remaining
+          if (prev === 6 && newTime === 5) {
+            // Dừng nhạc đếm ngược
+            if (audioCountdownRef.current) {
+              audioCountdownRef.current.pause();
+              audioCountdownRef.current.currentTime = 0;
+            }
+            // Phát nhạc 5s-remaining
+            if (audio5sRemainingRef.current) {
+              audio5sRemainingRef.current.currentTime = 0;
+              audio5sRemainingRef.current.play().catch(() => {
+                // Autoplay may be blocked
+              });
+            }
+          }
+          
+          if (newTime <= 0) {
             stopTimer();
             setIsTimeUp(true);
             return 0;
           }
-          return prev - 1;
+          return newTime;
         });
       }, 1000);
     }
@@ -430,10 +538,17 @@ function XepChu() {
           </section>
         ) : (
           <>
-            {/* Mark Answer Buttons */}
+            {/* Show Answer and Mark Answer Buttons */}
             {level > 0 && (
               <div className="text-center mb-4 sm:mb-6">
                 <div className="flex items-center justify-center gap-3 flex-wrap">
+                  <button
+                    onClick={handleShowAnswer}
+                    disabled={completedLevels.has(level) || showAnswer}
+                    className="px-4 py-2 sm:px-5 sm:py-3 rounded-xl bg-blue-500/20 border border-blue-400/50 text-blue-200 text-sm sm:text-base font-medium hover:bg-blue-500/30 transition shadow-lg disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    👁️ Hiển thị đáp án
+                  </button>
                   <button
                     onClick={() => markAnswer(true)}
                     disabled={completedLevels.has(level)}
@@ -537,14 +652,6 @@ function XepChu() {
                             {currentWord.toUpperCase()}
                           </div>
                           <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-                            {!completedLevels.has(level) && (
-                              <button
-                                onClick={handleReset}
-                                className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-white/10 border border-white/20 text-xs sm:text-sm font-medium text-white hover:bg-white/20 transition"
-                              >
-                                Chơi lại
-                              </button>
-                            )}
                             <button
                               onClick={handleNext}
                               disabled={!completedLevels.has(level)}
