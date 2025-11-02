@@ -132,8 +132,8 @@ function XepChu() {
     () => new URL("../../assets/music/demnguoc.mp3", import.meta.url).href,
     []
   );
-  const audioUrl5sRemaining = useMemo(
-    () => new URL("../../assets/music/5s-remaining.mp3", import.meta.url).href,
+  const audioUrlHetGio = useMemo(
+    () => new URL("../../assets/music/het-gio.mp3", import.meta.url).href,
     []
   );
   const audioUrlMagic = useMemo(
@@ -145,16 +145,18 @@ function XepChu() {
   const audioCorrectRef = useRef<HTMLAudioElement | null>(null);
   const audioIncorrectRef = useRef<HTMLAudioElement | null>(null);
   const audioCountdownRef = useRef<HTMLAudioElement | null>(null);
-  const audio5sRemainingRef = useRef<HTMLAudioElement | null>(null);
+  const audioHetGioRef = useRef<HTMLAudioElement | null>(null);
   const audioMagicRef = useRef<HTMLAudioElement | null>(null);
 
   // Lấy thời gian theo level
   const getTimeByLevel = (currentLevel: number): number => {
     if (currentLevel === 0) return 0;
-    if (currentLevel >= 1 && currentLevel <= 3) return 15;
-    if (currentLevel >= 4 && currentLevel <= 6) return 20;
-    if (currentLevel >= 7 && currentLevel <= 10) return 30;
-    return 15;
+    if (currentLevel === 1 || currentLevel === 2) return 15;
+    if (currentLevel === 3 || currentLevel === 4) return 20;
+    if (currentLevel === 5 || currentLevel === 6) return 25;
+    if (currentLevel === 7 || currentLevel === 8) return 30;
+    if (currentLevel === 9 || currentLevel === 10) return 35;
+    return 0;
   };
 
   // Lấy từ ngẫu nhiên dựa trên level
@@ -202,10 +204,10 @@ function XepChu() {
       audioCountdownRef.current.pause();
       audioCountdownRef.current.currentTime = 0;
     }
-    // Dừng nhạc 5s còn lại
-    if (audio5sRemainingRef.current) {
-      audio5sRemainingRef.current.pause();
-      audio5sRemainingRef.current.currentTime = 0;
+    // Dừng nhạc hết giờ
+    if (audioHetGioRef.current) {
+      audioHetGioRef.current.pause();
+      audioHetGioRef.current.currentTime = 0;
     }
   };
 
@@ -236,26 +238,19 @@ function XepChu() {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
           
-          // Khi còn 4 giây, chuyển sang nhạc 5s-remaining
-          if (prev === 5 && newTime === 4) {
-            // Dừng nhạc đếm ngược
-            if (audioCountdownRef.current) {
-              audioCountdownRef.current.pause();
-              audioCountdownRef.current.currentTime = 0;
-            }
-            // Phát nhạc 5s-remaining
-            if (audio5sRemainingRef.current) {
-              audio5sRemainingRef.current.currentTime = 0;
-              audio5sRemainingRef.current.play().catch(() => {
-                // Autoplay may be blocked
-              });
-            }
-          }
-          
           if (newTime <= 0) {
             stopTimer();
             // Hiển thị "Time up" khi hết thời gian
             setIsTimeUp(true);
+            
+            // Phát nhạc hết giờ
+            if (audioHetGioRef.current) {
+              audioHetGioRef.current.currentTime = 0;
+              audioHetGioRef.current.play().catch(() => {
+                // Autoplay may be blocked
+              });
+            }
+            
             return 0;
           }
           return newTime;
@@ -331,10 +326,10 @@ function XepChu() {
       audioCountdownRef.current.volume = 0.7;
       audioCountdownRef.current.preload = "auto";
       
-      // Load nhạc 5s còn lại
-      audio5sRemainingRef.current = new Audio(audioUrl5sRemaining);
-      audio5sRemainingRef.current.volume = 0.7;
-      audio5sRemainingRef.current.preload = "auto";
+      // Load nhạc hết giờ
+      audioHetGioRef.current = new Audio(audioUrlHetGio);
+      audioHetGioRef.current.volume = 0.7;
+      audioHetGioRef.current.preload = "auto";
       
       // Load nhạc magic
       audioMagicRef.current = new Audio(audioUrlMagic);
@@ -368,9 +363,9 @@ function XepChu() {
           }
         }),
         new Promise<void>((resolve) => {
-          if (audio5sRemainingRef.current) {
-            audio5sRemainingRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
-            audio5sRemainingRef.current.load();
+          if (audioHetGioRef.current) {
+            audioHetGioRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioHetGioRef.current.load();
           } else {
             resolve();
           }
@@ -409,16 +404,16 @@ function XepChu() {
         audioCountdownRef.current.pause();
         audioCountdownRef.current = null;
       }
-      if (audio5sRemainingRef.current) {
-        audio5sRemainingRef.current.pause();
-        audio5sRemainingRef.current = null;
+      if (audioHetGioRef.current) {
+        audioHetGioRef.current.pause();
+        audioHetGioRef.current = null;
       }
       if (audioMagicRef.current) {
         audioMagicRef.current.pause();
         audioMagicRef.current = null;
       }
     };
-  }, [audioUrlCorrect, audioUrlIncorrect, audioUrlCountdown, audioUrl5sRemaining, audioUrlMagic]);
+  }, [audioUrlCorrect, audioUrlIncorrect, audioUrlCountdown, audioUrlHetGio, audioUrlMagic]);
 
   // Kiểm tra level có được unlock không
   const isLevelUnlocked = (lvl: number) => {
@@ -537,25 +532,18 @@ function XepChu() {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
           
-          // Khi còn 4 giây, chuyển sang nhạc 5s-remaining
-          if (prev === 5 && newTime === 4) {
-            // Dừng nhạc đếm ngược
-            if (audioCountdownRef.current) {
-              audioCountdownRef.current.pause();
-              audioCountdownRef.current.currentTime = 0;
-            }
-            // Phát nhạc 5s-remaining
-            if (audio5sRemainingRef.current) {
-              audio5sRemainingRef.current.currentTime = 0;
-              audio5sRemainingRef.current.play().catch(() => {
-                // Autoplay may be blocked
-              });
-            }
-          }
-          
           if (newTime <= 0) {
             stopTimer();
             setIsTimeUp(true);
+            
+            // Phát nhạc hết giờ
+            if (audioHetGioRef.current) {
+              audioHetGioRef.current.currentTime = 0;
+              audioHetGioRef.current.play().catch(() => {
+                // Autoplay may be blocked
+              });
+            }
+            
             return 0;
           }
           return newTime;

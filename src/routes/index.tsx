@@ -24,6 +24,20 @@ function App() {
       to: '/games/xep-chu',
       colors: 'from-blue-500 via-purple-500 to-pink-500',
     },
+    {
+      id: 'duoi-hinh-bat-chu',
+      name: 'Đuổi hình bắt chữ',
+      emoji: '🖼️',
+      to: '/games/duoi-hinh-bat-chu',
+      colors: 'from-cyan-500 via-teal-500 to-green-500',
+    },
+    {
+      id: 'vong-quay-may-man',
+      name: 'Vòng quay may mắn',
+      emoji: '🎡',
+      to: '/games/vong-quay-may-man',
+      colors: 'from-orange-500 via-red-500 to-pink-500',
+    },
   ]
 
   return (

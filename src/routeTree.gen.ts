@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GamesXepChuRouteImport } from './routes/games/xep-chu'
+import { Route as GamesVongQuayMayManRouteImport } from './routes/games/vong-quay-may-man'
+import { Route as GamesDuoiHinhBatChuRouteImport } from './routes/games/duoi-hinh-bat-chu'
 import { Route as GamesAnimalChallengeRouteImport } from './routes/games/animal-challenge'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +25,16 @@ const GamesXepChuRoute = GamesXepChuRouteImport.update({
   path: '/games/xep-chu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesVongQuayMayManRoute = GamesVongQuayMayManRouteImport.update({
+  id: '/games/vong-quay-may-man',
+  path: '/games/vong-quay-may-man',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesDuoiHinhBatChuRoute = GamesDuoiHinhBatChuRouteImport.update({
+  id: '/games/duoi-hinh-bat-chu',
+  path: '/games/duoi-hinh-bat-chu',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GamesAnimalChallengeRoute = GamesAnimalChallengeRouteImport.update({
   id: '/games/animal-challenge',
   path: '/games/animal-challenge',
@@ -32,30 +44,54 @@ const GamesAnimalChallengeRoute = GamesAnimalChallengeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/games/animal-challenge': typeof GamesAnimalChallengeRoute
+  '/games/duoi-hinh-bat-chu': typeof GamesDuoiHinhBatChuRoute
+  '/games/vong-quay-may-man': typeof GamesVongQuayMayManRoute
   '/games/xep-chu': typeof GamesXepChuRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/games/animal-challenge': typeof GamesAnimalChallengeRoute
+  '/games/duoi-hinh-bat-chu': typeof GamesDuoiHinhBatChuRoute
+  '/games/vong-quay-may-man': typeof GamesVongQuayMayManRoute
   '/games/xep-chu': typeof GamesXepChuRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/games/animal-challenge': typeof GamesAnimalChallengeRoute
+  '/games/duoi-hinh-bat-chu': typeof GamesDuoiHinhBatChuRoute
+  '/games/vong-quay-may-man': typeof GamesVongQuayMayManRoute
   '/games/xep-chu': typeof GamesXepChuRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/games/animal-challenge' | '/games/xep-chu'
+  fullPaths:
+    | '/'
+    | '/games/animal-challenge'
+    | '/games/duoi-hinh-bat-chu'
+    | '/games/vong-quay-may-man'
+    | '/games/xep-chu'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/games/animal-challenge' | '/games/xep-chu'
-  id: '__root__' | '/' | '/games/animal-challenge' | '/games/xep-chu'
+  to:
+    | '/'
+    | '/games/animal-challenge'
+    | '/games/duoi-hinh-bat-chu'
+    | '/games/vong-quay-may-man'
+    | '/games/xep-chu'
+  id:
+    | '__root__'
+    | '/'
+    | '/games/animal-challenge'
+    | '/games/duoi-hinh-bat-chu'
+    | '/games/vong-quay-may-man'
+    | '/games/xep-chu'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   GamesAnimalChallengeRoute: typeof GamesAnimalChallengeRoute
+  GamesDuoiHinhBatChuRoute: typeof GamesDuoiHinhBatChuRoute
+  GamesVongQuayMayManRoute: typeof GamesVongQuayMayManRoute
   GamesXepChuRoute: typeof GamesXepChuRoute
 }
 
@@ -75,6 +111,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GamesXepChuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/vong-quay-may-man': {
+      id: '/games/vong-quay-may-man'
+      path: '/games/vong-quay-may-man'
+      fullPath: '/games/vong-quay-may-man'
+      preLoaderRoute: typeof GamesVongQuayMayManRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/duoi-hinh-bat-chu': {
+      id: '/games/duoi-hinh-bat-chu'
+      path: '/games/duoi-hinh-bat-chu'
+      fullPath: '/games/duoi-hinh-bat-chu'
+      preLoaderRoute: typeof GamesDuoiHinhBatChuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/games/animal-challenge': {
       id: '/games/animal-challenge'
       path: '/games/animal-challenge'
@@ -88,6 +138,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   GamesAnimalChallengeRoute: GamesAnimalChallengeRoute,
+  GamesDuoiHinhBatChuRoute: GamesDuoiHinhBatChuRoute,
+  GamesVongQuayMayManRoute: GamesVongQuayMayManRoute,
   GamesXepChuRoute: GamesXepChuRoute,
 }
 export const routeTree = rootRouteImport
