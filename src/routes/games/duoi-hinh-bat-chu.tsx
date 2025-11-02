@@ -10,7 +10,7 @@ function DuoiHinhBatChu() {
     document.title = "Đuổi hình bắt chữ | Trò chơi giải trí | KhaiBQ.net";
   }, []);
 
-  const [score, setScore] = useState(0);
+  const [score] = useState(0);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100">

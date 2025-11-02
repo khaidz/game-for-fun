@@ -1,4 +1,13 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { HelpCircle } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/games/xep-chu")({
@@ -19,82 +28,526 @@ const capitalizeWords = (str: string): string => {
 
 const wordsByLevelRaw: Record<number, string[]> = {
   1: [
-    "con mèo", "con chó", "con gà", "con cá", "con trâu", "con bò", "con vịt", "con chim", "con chuột", "con dê",
-    "cái bàn", "cái ghế", "cái nồi", "cái bát", "cái chén", "cái cốc", "cái muỗng", "cái kéo", "cái thước", "cái đèn",
-    "ngôi nhà", "khu vườn", "bờ sông", "ngọn núi", "dòng suối", "bầu trời", "mặt trời", "mặt trăng", "đám mây", "cánh đồng",
-    "bông hoa", "trái cây", "bát cơm", "ly nước", "nồi canh", "bức tranh", "quyển sách", "tờ báo", "cây bút", "chiếc áo",
-    "đôi dép", "đôi giày", "chiếc mũ", "bức tranh", "chiếc gối", "cái quạt", "tivi", "điện thoại", "máy tính", "xe đạp"
+    "con mèo",
+    "con chó",
+    "con gà",
+    "con cá",
+    "con trâu",
+    "con bò",
+    "con vịt",
+    "con chim",
+    "con chuột",
+    "con dê",
+    "cái bàn",
+    "cái ghế",
+    "cái nồi",
+    "cái bát",
+    "cái chén",
+    "cái cốc",
+    "cái muỗng",
+    "cái kéo",
+    "cái thước",
+    "cái đèn",
+    "ngôi nhà",
+    "khu vườn",
+    "bờ sông",
+    "ngọn núi",
+    "dòng suối",
+    "bầu trời",
+    "mặt trời",
+    "mặt trăng",
+    "đám mây",
+    "cánh đồng",
+    "bông hoa",
+    "trái cây",
+    "bát cơm",
+    "ly nước",
+    "nồi canh",
+    "bức tranh",
+    "quyển sách",
+    "tờ báo",
+    "cây bút",
+    "chiếc áo",
+    "đôi dép",
+    "đôi giày",
+    "chiếc mũ",
+    "bức tranh",
+    "chiếc gối",
+    "cái quạt",
+    "tivi",
+    "điện thoại",
+    "máy tính",
+    "xe đạp",
   ],
   2: [
-    "ngôi trường", "phòng học", "bảng đen", "cây phấn", "quyển vở", "bút chì", "bút mực", "bàn giáo viên", "sân trường", "giờ học",
-    "ngôi chợ", "quầy hàng", "sạp rau", "cửa hàng", "nhà bếp", "bữa cơm", "bát phở", "đĩa cơm", "nồi cơm", "ly cà phê",
-    "con đường", "cây cầu", "hàng cây", "ngôi đình", "lũy tre", "giếng nước", "cánh diều", "ánh đèn", "bóng đèn", "âm thanh",
-    "mùa xuân", "mùa hè", "mùa thu", "mùa đông", "ngày lễ", "buổi sáng", "buổi tối", "bữa sáng", "bữa tối", "bữa trưa",
-    "đôi mắt", "bàn tay", "khuôn mặt", "nụ cười", "tiếng cười", "ngôi làng", "con phố", "góc phố", "khu chợ", "nhà sàn"
+    "ngôi trường",
+    "phòng học",
+    "bảng đen",
+    "cây phấn",
+    "quyển vở",
+    "bút chì",
+    "bút mực",
+    "bàn giáo viên",
+    "sân trường",
+    "giờ học",
+    "ngôi chợ",
+    "quầy hàng",
+    "sạp rau",
+    "cửa hàng",
+    "nhà bếp",
+    "bữa cơm",
+    "bát phở",
+    "đĩa cơm",
+    "nồi cơm",
+    "ly cà phê",
+    "con đường",
+    "cây cầu",
+    "hàng cây",
+    "ngôi đình",
+    "lũy tre",
+    "giếng nước",
+    "cánh diều",
+    "ánh đèn",
+    "bóng đèn",
+    "âm thanh",
+    "mùa xuân",
+    "mùa hè",
+    "mùa thu",
+    "mùa đông",
+    "ngày lễ",
+    "buổi sáng",
+    "buổi tối",
+    "bữa sáng",
+    "bữa tối",
+    "bữa trưa",
+    "đôi mắt",
+    "bàn tay",
+    "khuôn mặt",
+    "nụ cười",
+    "tiếng cười",
+    "ngôi làng",
+    "con phố",
+    "góc phố",
+    "khu chợ",
+    "nhà sàn",
   ],
   3: [
-    "thành phố", "nhà cao", "xe buýt", "ga tàu", "trạm xe", "siêu thị", "quán cà phê", "nhà hàng", "công viên", "bãi biển",
-    "khu phố", "chung cư", "tòa nhà", "khu nghỉ", "khách sạn", "hướng dẫn", "sân bay", "phòng chờ", "bến xe", "đèn đường",
-    "điện thoại", "máy ảnh", "máy tính", "nghênh ngang", "mạng xã hội", "ứng dụng", "tin nhắn", "email", "phần mềm", "trò chơi",
-    "video trực tuyến", "màn hình", "âm nhạc", "thẻ ngân hàng", "máy rút", "hóa đơn", "tài khoản", "mật khẩu", "giao dịch", "mã QR",
-    "cửa hàng", "sản phẩm", "đơn hàng", "vận chuyển", "giao hàng", "kho hàng", "nhân viên", "khách hàng", "dịch vụ", "chính sách"
+    "thành phố",
+    "nhà cao",
+    "xe buýt",
+    "ga tàu",
+    "trạm xe",
+    "siêu thị",
+    "quán cà phê",
+    "nhà hàng",
+    "công viên",
+    "bãi biển",
+    "khu phố",
+    "chung cư",
+    "tòa nhà",
+    "khu nghỉ",
+    "khách sạn",
+    "hướng dẫn",
+    "sân bay",
+    "phòng chờ",
+    "bến xe",
+    "đèn đường",
+    "điện thoại",
+    "máy ảnh",
+    "máy tính",
+    "nghênh ngang",
+    "mạng xã hội",
+    "ứng dụng",
+    "tin nhắn",
+    "email",
+    "phần mềm",
+    "trò chơi",
+    "video trực tuyến",
+    "màn hình",
+    "âm nhạc",
+    "thẻ ngân hàng",
+    "máy rút",
+    "hóa đơn",
+    "tài khoản",
+    "mật khẩu",
+    "giao dịch",
+    "mã QR",
+    "cửa hàng",
+    "sản phẩm",
+    "đơn hàng",
+    "vận chuyển",
+    "giao hàng",
+    "kho hàng",
+    "nhân viên",
+    "khách hàng",
+    "dịch vụ",
+    "chính sách",
   ],
   4: [
-    "buổi họp", "kế hoạch", "lịch trình", "báo cáo", "dự án", "phòng họp", "văn phòng", "máy in", "máy fax", "giấy tờ",
-    "quản lý", "nhân sự", "cấp trên", "đồng nghiệp", "thư ký", "công ty", "chi nhánh", "trụ sở", "hợp đồng", "chữ ký",
-    "sản phẩm", "nhãn hiệu", "quảng cáo", "doanh thu", "lợi nhuận", "chi phí", "giá vốn", "thị trường", "người tiêu dùng", "bảng giá",
-    "cuộc họp", "bản tin", "thông báo", "biên bản", "tài liệu", "phòng ban", "bộ phận", "kế toán", "pháp nhân", "ngân quỹ",
-    "máy in", "máy photo", "bàn làm việc", "máy lạnh", "hồ sơ", "bìa hồ sơ", "giấy phép", "con dấu", "hóa đơn", "phiếu thu"
+    "buổi họp",
+    "kế hoạch",
+    "lịch trình",
+    "báo cáo",
+    "dự án",
+    "phòng họp",
+    "văn phòng",
+    "máy in",
+    "máy fax",
+    "giấy tờ",
+    "quản lý",
+    "nhân sự",
+    "cấp trên",
+    "đồng nghiệp",
+    "thư ký",
+    "công ty",
+    "chi nhánh",
+    "trụ sở",
+    "hợp đồng",
+    "chữ ký",
+    "sản phẩm",
+    "nhãn hiệu",
+    "quảng cáo",
+    "doanh thu",
+    "lợi nhuận",
+    "chi phí",
+    "giá vốn",
+    "thị trường",
+    "người tiêu dùng",
+    "bảng giá",
+    "cuộc họp",
+    "bản tin",
+    "thông báo",
+    "biên bản",
+    "tài liệu",
+    "phòng ban",
+    "bộ phận",
+    "kế toán",
+    "pháp nhân",
+    "ngân quỹ",
+    "máy in",
+    "máy photo",
+    "bàn làm việc",
+    "máy lạnh",
+    "hồ sơ",
+    "bìa hồ sơ",
+    "giấy phép",
+    "con dấu",
+    "hóa đơn",
+    "phiếu thu",
   ],
   5: [
-    "trường đại học", "giảng viên", "sinh viên", "thư viện", "phòng thí nghiệm", "giáo trình", "môn học", "bài giảng", "kỳ thi", "bằng cấp",
-    "nghiên cứu", "đề tài", "kết quả", "số liệu", "thống kê", "dữ liệu", "bảng biểu", "biểu đồ", "mẫu vật", "học bổng",
-    "giáo dục", "đào tạo", "chương trình", "bài tập", "trường lớp", "học kỳ", "giáo án", "thi cử", "bảng điểm", "học sinh",
-    "bệnh viện", "bác sĩ", "y tá", "bệnh nhân", "phòng khám", "thuốc men", "giường bệnh", "sức khỏe", "dịch bệnh", "vắc xin",
-    "chăm sóc", "khẩu trang", "nhiệt kế", "máy đo", "máu huyết", "tim mạch", "hô hấp", "não bộ", "xương khớp", "hệ thần kinh"
+    "trường đại học",
+    "giảng viên",
+    "sinh viên",
+    "thư viện",
+    "phòng thí nghiệm",
+    "giáo trình",
+    "môn học",
+    "bài giảng",
+    "kỳ thi",
+    "bằng cấp",
+    "nghiên cứu",
+    "đề tài",
+    "kết quả",
+    "số liệu",
+    "thống kê",
+    "dữ liệu",
+    "bảng biểu",
+    "biểu đồ",
+    "mẫu vật",
+    "học bổng",
+    "giáo dục",
+    "đào tạo",
+    "chương trình",
+    "bài tập",
+    "trường lớp",
+    "học kỳ",
+    "giáo án",
+    "thi cử",
+    "bảng điểm",
+    "học sinh",
+    "bệnh viện",
+    "bác sĩ",
+    "y tá",
+    "bệnh nhân",
+    "phòng khám",
+    "thuốc men",
+    "giường bệnh",
+    "sức khỏe",
+    "dịch bệnh",
+    "vắc xin",
+    "chăm sóc",
+    "khẩu trang",
+    "nhiệt kế",
+    "máy đo",
+    "máu huyết",
+    "tim mạch",
+    "hô hấp",
+    "não bộ",
+    "xương khớp",
+    "hệ thần kinh",
   ],
   6: [
-    "du khách", "hướng dẫn viên", "địa điểm", "bản đồ", "vé máy bay", "sân bay", "khu du lịch", "phòng khách", "khách sạn", "nhà nghỉ",
-    "bữa sáng", "nhà hàng", "thực đơn", "đồ uống", "đặc sản", "hóa đơn", "tiền mặt", "thẻ tín dụng", "máy tính bảng", "máy ảnh số",
-    "thời tiết", "nhiệt độ", "bầu không khí", "gió mùa", "biển xanh", "núi rừng", "sông suối", "đảo nhỏ", "vùng biển", "khu sinh thái",
-    "văn hóa", "truyền thống", "phong tục", "tập quán", "lễ hội", "trang phục", "ẩm thực", "nghệ thuật", "di sản", "danh lam",
-    "bảo tàng", "nhà hát", "sân khấu", "bức tượng", "bức tranh", "kiến trúc", "công trình", "cổng thành", "điện thờ", "ngôi đền"
+    "du khách",
+    "hướng dẫn viên",
+    "địa điểm",
+    "bản đồ",
+    "vé máy bay",
+    "sân bay",
+    "khu du lịch",
+    "phòng khách",
+    "khách sạn",
+    "nhà nghỉ",
+    "bữa sáng",
+    "nhà hàng",
+    "thực đơn",
+    "đồ uống",
+    "đặc sản",
+    "hóa đơn",
+    "tiền mặt",
+    "thẻ tín dụng",
+    "máy tính bảng",
+    "máy ảnh số",
+    "thời tiết",
+    "nhiệt độ",
+    "bầu không khí",
+    "gió mùa",
+    "biển xanh",
+    "núi rừng",
+    "sông suối",
+    "đảo nhỏ",
+    "vùng biển",
+    "khu sinh thái",
+    "văn hóa",
+    "truyền thống",
+    "phong tục",
+    "tập quán",
+    "lễ hội",
+    "trang phục",
+    "ẩm thực",
+    "nghệ thuật",
+    "di sản",
+    "danh lam",
+    "bảo tàng",
+    "nhà hát",
+    "sân khấu",
+    "bức tượng",
+    "bức tranh",
+    "kiến trúc",
+    "công trình",
+    "cổng thành",
+    "điện thờ",
+    "ngôi đền",
   ],
   7: [
-    "nền kinh tế", "thị trường", "ngân hàng", "tài chính", "đầu tư", "doanh nghiệp", "cổ phiếu", "lợi nhuận", "vốn điều lệ", "thuế suất",
-    "bộ luật", "hệ thống", "chính sách", "cơ quan", "người dân", "chính phủ", "quốc hội", "hội đồng", "ủy ban", "văn bản",
-    "báo cáo", "thống kê", "kết quả", "chỉ số", "tăng trưởng", "sản lượng", "doanh thu", "ngân sách", "chi tiêu", "xuất khẩu",
-    "truyền thông", "báo chí", "phóng viên", "tin tức", "trang mạng", "phản hồi", "thông tin", "quảng bá", "diễn đàn", "bài viết",
-    "môi trường", "khí hậu", "rừng cây", "nguồn nước", "chất thải", "năng lượng", "tái chế", "ô nhiễm", "bảo tồn", "thiên nhiên"
+    "nền kinh tế",
+    "thị trường",
+    "ngân hàng",
+    "tài chính",
+    "đầu tư",
+    "doanh nghiệp",
+    "cổ phiếu",
+    "lợi nhuận",
+    "vốn điều lệ",
+    "thuế suất",
+    "bộ luật",
+    "hệ thống",
+    "chính sách",
+    "cơ quan",
+    "người dân",
+    "chính phủ",
+    "quốc hội",
+    "hội đồng",
+    "ủy ban",
+    "văn bản",
+    "báo cáo",
+    "thống kê",
+    "kết quả",
+    "chỉ số",
+    "tăng trưởng",
+    "sản lượng",
+    "doanh thu",
+    "ngân sách",
+    "chi tiêu",
+    "xuất khẩu",
+    "truyền thông",
+    "báo chí",
+    "phóng viên",
+    "tin tức",
+    "trang mạng",
+    "phản hồi",
+    "thông tin",
+    "quảng bá",
+    "diễn đàn",
+    "bài viết",
+    "môi trường",
+    "khí hậu",
+    "rừng cây",
+    "nguồn nước",
+    "chất thải",
+    "năng lượng",
+    "tái chế",
+    "ô nhiễm",
+    "bảo tồn",
+    "thiên nhiên",
   ],
   8: [
-    "công nghiệp", "nông nghiệp", "lâm nghiệp", "thủy sản", "chăn nuôi", "trồng trọt", "nhà máy", "xí nghiệp", "dây chuyền", "khu công nghiệp",
-    "công nhân", "kỹ sư", "quản đốc", "máy móc", "thiết bị", "công nghệ", "robot tự động", "sản phẩm", "nguyên liệu", "vật liệu",
-    "thương mại", "xuất khẩu", "nhập khẩu", "vận tải", "giao nhận", "hóa đơn", "đơn hàng", "hợp đồng", "kho bãi", "giao dịch",
-    "tài chính", "ngân hàng", "chứng khoán", "cổ phần", "trái phiếu", "quỹ đầu tư", "tín dụng", "bảo hiểm", "doanh thu", "lợi nhuận",
-    "kế toán", "kiểm toán", "ngân sách", "chi phí", "giá trị", "thị phần", "tăng trưởng", "đổi mới", "hiệu quả", "chiến lược"
+    "công nghiệp",
+    "nông nghiệp",
+    "lâm nghiệp",
+    "thủy sản",
+    "chăn nuôi",
+    "trồng trọt",
+    "nhà máy",
+    "xí nghiệp",
+    "dây chuyền",
+    "khu công nghiệp",
+    "công nhân",
+    "kỹ sư",
+    "quản đốc",
+    "máy móc",
+    "thiết bị",
+    "công nghệ",
+    "robot tự động",
+    "sản phẩm",
+    "nguyên liệu",
+    "vật liệu",
+    "thương mại",
+    "xuất khẩu",
+    "nhập khẩu",
+    "vận tải",
+    "giao nhận",
+    "hóa đơn",
+    "đơn hàng",
+    "hợp đồng",
+    "kho bãi",
+    "giao dịch",
+    "tài chính",
+    "ngân hàng",
+    "chứng khoán",
+    "cổ phần",
+    "trái phiếu",
+    "quỹ đầu tư",
+    "tín dụng",
+    "bảo hiểm",
+    "doanh thu",
+    "lợi nhuận",
+    "kế toán",
+    "kiểm toán",
+    "ngân sách",
+    "chi phí",
+    "giá trị",
+    "thị phần",
+    "tăng trưởng",
+    "đổi mới",
+    "hiệu quả",
+    "chiến lược",
   ],
   9: [
-    "công trình", "kiến trúc", "xây dựng", "thiết kế", "vật liệu", "bản vẽ", "kỹ sư", "giám sát", "nhà thầu", "công trường",
-    "giao thông", "đường bộ", "đường sắt", "đường thủy", "đường hàng không", "xe container", "cầu vượt", "hầm đường", "biển báo", "tín hiệu",
-    "năng lượng", "điện gió", "điện mặt trời", "nhiên liệu", "trạm điện", "máy phát", "điện áp", "công suất", "lưới điện", "pin lưu trữ",
-    "viễn thông", "trạm phát", "vệ tinh", "tín hiệu", "mạng cáp", "thiết bị", "điện thoại", "máy chủ", "máy tính", "dữ liệu",
-    "an ninh", "phòng cháy", "cứu hộ", "bảo vệ", "kiểm tra", "giấy phép", "quy chuẩn", "an toàn", "giám định", "chứng nhận"
+    "công trình",
+    "kiến trúc",
+    "xây dựng",
+    "thiết kế",
+    "vật liệu",
+    "bản vẽ",
+    "kỹ sư",
+    "giám sát",
+    "nhà thầu",
+    "công trường",
+    "giao thông",
+    "đường bộ",
+    "đường sắt",
+    "đường thủy",
+    "đường hàng không",
+    "xe container",
+    "cầu vượt",
+    "hầm đường",
+    "biển báo",
+    "tín hiệu",
+    "năng lượng",
+    "điện gió",
+    "điện mặt trời",
+    "nhiên liệu",
+    "trạm điện",
+    "máy phát",
+    "điện áp",
+    "công suất",
+    "lưới điện",
+    "pin lưu trữ",
+    "viễn thông",
+    "trạm phát",
+    "vệ tinh",
+    "tín hiệu",
+    "mạng cáp",
+    "thiết bị",
+    "điện thoại",
+    "máy chủ",
+    "máy tính",
+    "dữ liệu",
+    "an ninh",
+    "phòng cháy",
+    "cứu hộ",
+    "bảo vệ",
+    "kiểm tra",
+    "giấy phép",
+    "quy chuẩn",
+    "an toàn",
+    "giám định",
+    "chứng nhận",
   ],
   10: [
-    "ngôi nhà nhỏ", "bữa ăn sáng", "chuyến xe bus", "bữa tiệc nhỏ", "bộ bàn ghế",
-    "phòng khách lớn", "chiếc xe máy", "người bạn thân", "tấm ảnh cũ", "bức tường trắng",
-    "cửa sổ kính", "khu vườn nhỏ", "bãi biển đẹp", "ly cà phê", "tủ quần áo",
-    "đèn bàn học", "sân chơi trẻ", "giỏ hoa tươi", "chậu cây cảnh", "món ăn ngon",
-    "bộ quần áo", "tòa nhà cao", "bữa cơm tối", "ngôi trường làng", "bến xe buýt",
-    "công viên xanh", "bộ phim hay", "cuốn sách mới", "gian bếp nhỏ", "bức tranh treo",
-    "tủ lạnh lớn", "chiếc giày mới", "sân thượng rộng", "điện thoại cũ", "chiếc cặp sách",
-    "tấm gương soi", "đĩa trái cây", "món quà nhỏ", "chiếc balo đen", "bộ ấm chén",
-    "phòng ngủ nhỏ", "ly nước cam", "chiếc nồi cơm", "bộ đồ ăn", "kệ sách gỗ",
-    "cây đàn piano", "chậu hoa lan", "đèn trần sáng", "chiếc ghế gỗ", "người hàng xóm"
-  ]
+    "ngôi nhà nhỏ",
+    "bữa ăn sáng",
+    "chuyến xe bus",
+    "bữa tiệc nhỏ",
+    "bộ bàn ghế",
+    "phòng khách lớn",
+    "chiếc xe máy",
+    "người bạn thân",
+    "tấm ảnh cũ",
+    "bức tường trắng",
+    "cửa sổ kính",
+    "khu vườn nhỏ",
+    "bãi biển đẹp",
+    "ly cà phê",
+    "tủ quần áo",
+    "đèn bàn học",
+    "sân chơi trẻ",
+    "giỏ hoa tươi",
+    "chậu cây cảnh",
+    "món ăn ngon",
+    "bộ quần áo",
+    "tòa nhà cao",
+    "bữa cơm tối",
+    "ngôi trường làng",
+    "bến xe buýt",
+    "công viên xanh",
+    "bộ phim hay",
+    "cuốn sách mới",
+    "gian bếp nhỏ",
+    "bức tranh treo",
+    "tủ lạnh lớn",
+    "chiếc giày mới",
+    "sân thượng rộng",
+    "điện thoại cũ",
+    "chiếc cặp sách",
+    "tấm gương soi",
+    "đĩa trái cây",
+    "món quà nhỏ",
+    "chiếc balo đen",
+    "bộ ấm chén",
+    "phòng ngủ nhỏ",
+    "ly nước cam",
+    "chiếc nồi cơm",
+    "bộ đồ ăn",
+    "kệ sách gỗ",
+    "cây đàn piano",
+    "chậu hoa lan",
+    "đèn trần sáng",
+    "chiếc ghế gỗ",
+    "người hàng xóm",
+  ],
 };
-
 
 // Áp dụng capitalize cho tất cả các từ
 const wordsByLevel: Record<number, string[]> = Object.fromEntries(
@@ -115,10 +568,46 @@ function XepChu() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimeUp, setIsTimeUp] = useState(false);
-  const [completedLevels, setCompletedLevels] = useState<Set<number>>(new Set());
-  const [levelResults, setLevelResults] = useState<Record<number, 'correct' | 'incorrect' | null>>({});
+  const [completedLevels, setCompletedLevels] = useState<Set<number>>(
+    new Set()
+  );
+  const [levelResults, setLevelResults] = useState<
+    Record<number, "correct" | "incorrect" | null>
+  >({});
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
   const timerRef = useRef<number | null>(null);
-  
+
+  // Thông tin về các level (đã gộp theo cặp)
+  const levelInfo = [
+    {
+      levels: "1-2",
+      time: "15 giây",
+      description:
+        "Từ đơn giản, hiển thị đúng định dạng (có dấu, đúng chữ hoa/thường)",
+    },
+    {
+      levels: "3-4",
+      time: "20 giây",
+      description: "Từ hiển thị dưới dạng chữ thường (lowercase)",
+    },
+    {
+      levels: "5-6",
+      time: "25 giây",
+      description: "Từ hiển thị dưới dạng chữ hoa (uppercase)",
+    },
+    {
+      levels: "7-8",
+      time: "30 giây",
+      description: "Từ hiển thị không dấu (bỏ dấu tiếng Việt)",
+    },
+    {
+      levels: "9-10",
+      time: "35 giây",
+      description:
+        "Từ hiển thị không dấu và trộn lẫn chữ hoa/thường ngẫu nhiên",
+    },
+  ];
+
   // Audio URLs
   const audioUrlCorrect = useMemo(
     () => new URL("../../assets/music/xepchu-dung.mp3", import.meta.url).href,
@@ -140,7 +629,7 @@ function XepChu() {
     () => new URL("../../assets/music/magic.mp3", import.meta.url).href,
     []
   );
-  
+
   // Audio refs
   const audioCorrectRef = useRef<HTMLAudioElement | null>(null);
   const audioIncorrectRef = useRef<HTMLAudioElement | null>(null);
@@ -215,17 +704,17 @@ function XepChu() {
   const startTimer = (targetLevel: number) => {
     stopTimer();
     setIsTimeUp(false);
-    
+
     // Nếu level đã hoàn thành, không đếm ngược
     if (completedLevels.has(targetLevel)) {
       setTimeLeft(0);
       return;
     }
-    
+
     const time = getTimeByLevel(targetLevel);
     if (time > 0) {
       setTimeLeft(time);
-      
+
       // Phát nhạc đếm ngược
       if (audioCountdownRef.current) {
         audioCountdownRef.current.currentTime = 0;
@@ -233,16 +722,16 @@ function XepChu() {
           // Autoplay may be blocked
         });
       }
-      
+
       timerRef.current = window.setInterval(() => {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
-          
+
           if (newTime <= 0) {
             stopTimer();
             // Hiển thị "Time up" khi hết thời gian
             setIsTimeUp(true);
-            
+
             // Phát nhạc hết giờ
             if (audioHetGioRef.current) {
               audioHetGioRef.current.currentTime = 0;
@@ -250,7 +739,7 @@ function XepChu() {
                 // Autoplay may be blocked
               });
             }
-            
+
             return 0;
           }
           return newTime;
@@ -267,12 +756,12 @@ function XepChu() {
     const targetLevel = newLevel !== undefined ? newLevel : level;
     let word = getRandomWord(targetLevel);
     let displayWord = word;
-    
+
     if (targetLevel === 3 || targetLevel === 4) {
       displayWord = word.toLowerCase();
     }
     // Màn 5,6: uppercase hết
-    else if (targetLevel ===5 || targetLevel === 6) {
+    else if (targetLevel === 5 || targetLevel === 6) {
       displayWord = word.toUpperCase();
     }
     // Màn 7,8: bỏ dấu
@@ -283,10 +772,10 @@ function XepChu() {
     else if (targetLevel === 9 || targetLevel === 10) {
       displayWord = randomizeCase(removeVietnameseDiacritics(word));
     }
-    
+
     setCurrentWord(word); // Lưu từ gốc để hiển thị đáp án
     setShuffledLetters(displayWord ? shuffleLetters(displayWord) : []);
-    
+
     // Nếu level đã hoàn thành, hiển thị đáp án ngay
     if (completedLevels.has(targetLevel)) {
       setShowAnswer(true);
@@ -295,7 +784,7 @@ function XepChu() {
       setShowAnswer(false);
       setIsTimeUp(false);
     }
-    
+
     // Bắt đầu timer nếu level > 0
     if (targetLevel > 0) {
       startTimer(targetLevel);
@@ -308,39 +797,43 @@ function XepChu() {
   // Khởi tạo game lần đầu và audio
   useEffect(() => {
     initializeWord();
-    
+
     // Khởi tạo và preload tất cả audio
     const loadAudios = async () => {
       // Load nhạc đúng
       audioCorrectRef.current = new Audio(audioUrlCorrect);
       audioCorrectRef.current.volume = 0.7;
       audioCorrectRef.current.preload = "auto";
-      
+
       // Load nhạc sai
       audioIncorrectRef.current = new Audio(audioUrlIncorrect);
       audioIncorrectRef.current.volume = 0.5;
       audioIncorrectRef.current.preload = "auto";
-      
+
       // Load nhạc đếm ngược
       audioCountdownRef.current = new Audio(audioUrlCountdown);
       audioCountdownRef.current.volume = 0.7;
       audioCountdownRef.current.preload = "auto";
-      
+
       // Load nhạc hết giờ
       audioHetGioRef.current = new Audio(audioUrlHetGio);
       audioHetGioRef.current.volume = 0.7;
       audioHetGioRef.current.preload = "auto";
-      
+
       // Load nhạc magic
       audioMagicRef.current = new Audio(audioUrlMagic);
       audioMagicRef.current.volume = 0.7;
       audioMagicRef.current.preload = "auto";
-      
+
       // Force load tất cả audio để tránh delay khi phát
       const loadPromises = [
         new Promise<void>((resolve) => {
           if (audioCorrectRef.current) {
-            audioCorrectRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioCorrectRef.current.addEventListener(
+              "canplaythrough",
+              () => resolve(),
+              { once: true }
+            );
             audioCorrectRef.current.load();
           } else {
             resolve();
@@ -348,7 +841,11 @@ function XepChu() {
         }),
         new Promise<void>((resolve) => {
           if (audioIncorrectRef.current) {
-            audioIncorrectRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioIncorrectRef.current.addEventListener(
+              "canplaythrough",
+              () => resolve(),
+              { once: true }
+            );
             audioIncorrectRef.current.load();
           } else {
             resolve();
@@ -356,7 +853,11 @@ function XepChu() {
         }),
         new Promise<void>((resolve) => {
           if (audioCountdownRef.current) {
-            audioCountdownRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioCountdownRef.current.addEventListener(
+              "canplaythrough",
+              () => resolve(),
+              { once: true }
+            );
             audioCountdownRef.current.load();
           } else {
             resolve();
@@ -364,7 +865,11 @@ function XepChu() {
         }),
         new Promise<void>((resolve) => {
           if (audioHetGioRef.current) {
-            audioHetGioRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioHetGioRef.current.addEventListener(
+              "canplaythrough",
+              () => resolve(),
+              { once: true }
+            );
             audioHetGioRef.current.load();
           } else {
             resolve();
@@ -372,23 +877,27 @@ function XepChu() {
         }),
         new Promise<void>((resolve) => {
           if (audioMagicRef.current) {
-            audioMagicRef.current.addEventListener('canplaythrough', () => resolve(), { once: true });
+            audioMagicRef.current.addEventListener(
+              "canplaythrough",
+              () => resolve(),
+              { once: true }
+            );
             audioMagicRef.current.load();
           } else {
             resolve();
           }
         }),
       ];
-      
+
       // Đợi tất cả audio load xong (với timeout để không block quá lâu)
       await Promise.race([
         Promise.all(loadPromises),
-        new Promise(resolve => setTimeout(resolve, 5000)), // Timeout 5s
+        new Promise((resolve) => setTimeout(resolve, 5000)), // Timeout 5s
       ]);
     };
-    
+
     loadAudios();
-    
+
     // Cleanup timer và audio khi unmount
     return () => {
       stopTimer();
@@ -413,7 +922,13 @@ function XepChu() {
         audioMagicRef.current = null;
       }
     };
-  }, [audioUrlCorrect, audioUrlIncorrect, audioUrlCountdown, audioUrlHetGio, audioUrlMagic]);
+  }, [
+    audioUrlCorrect,
+    audioUrlIncorrect,
+    audioUrlCountdown,
+    audioUrlHetGio,
+    audioUrlMagic,
+  ]);
 
   // Kiểm tra level có được unlock không
   const isLevelUnlocked = (lvl: number) => {
@@ -427,7 +942,7 @@ function XepChu() {
     if (level > 0 && !completedLevels.has(level) && level !== newLevel) {
       return;
     }
-    
+
     // Chỉ cho phép chọn level đã unlock hoặc đã hoàn thành
     if (!isLevelUnlocked(newLevel) && !completedLevels.has(newLevel)) {
       return;
@@ -442,7 +957,7 @@ function XepChu() {
     // Dừng timer và nhạc đếm ngược
     stopTimer();
     setIsTimeUp(false);
-    
+
     // Phát nhạc magic
     if (audioMagicRef.current) {
       audioMagicRef.current.currentTime = 0;
@@ -454,19 +969,19 @@ function XepChu() {
 
   // Đánh dấu đáp án đúng/sai
   const markAnswer = (isCorrect: boolean) => {
-    const result = isCorrect ? 'correct' : 'incorrect';
-    setLevelResults(prev => ({
+    const result = isCorrect ? "correct" : "incorrect";
+    setLevelResults((prev) => ({
       ...prev,
-      [level]: result
+      [level]: result,
     }));
-    setCompletedLevels(prev => new Set(prev).add(level));
+    setCompletedLevels((prev) => new Set(prev).add(level));
     setShowAnswer(true);
-    
+
     // Dừng timer và nhạc đếm ngược trước khi phát nhạc đúng/sai
     stopTimer();
     setIsTimeUp(false);
     setTimeLeft(0);
-    
+
     // Phát nhạc báo (sau khi đã dừng nhạc đếm ngược)
     if (isCorrect && audioCorrectRef.current) {
       audioCorrectRef.current.currentTime = 0;
@@ -486,7 +1001,7 @@ function XepChu() {
     if (!completedLevels.has(level)) {
       return;
     }
-    
+
     const nextLevel = level < 10 ? level + 1 : 1;
     if (isLevelUnlocked(nextLevel)) {
       setLevel(nextLevel);
@@ -497,7 +1012,7 @@ function XepChu() {
   // Reset toàn bộ và bắt đầu từ level 1
   const handleStart = () => {
     stopTimer();
-    
+
     // Reset tất cả states
     setCompletedLevels(new Set());
     setLevelResults({});
@@ -507,19 +1022,19 @@ function XepChu() {
     setShowAnswer(false);
     setTimeLeft(0);
     setLevel(1);
-    
+
     // Khởi tạo từ mới cho level 1 với completedLevels đã được reset
     const word = getRandomWord(1);
     setCurrentWord(word);
     setShuffledLetters(word ? shuffleLetters(word) : []);
     setShowAnswer(false);
     setIsTimeUp(false);
-    
+
     // Bắt đầu timer cho level 1
     const time = getTimeByLevel(1);
     if (time > 0) {
       setTimeLeft(time);
-      
+
       // Phát nhạc đếm ngược
       if (audioCountdownRef.current) {
         audioCountdownRef.current.currentTime = 0;
@@ -527,15 +1042,15 @@ function XepChu() {
           // Autoplay may be blocked
         });
       }
-      
+
       timerRef.current = window.setInterval(() => {
         setTimeLeft((prev) => {
           const newTime = prev - 1;
-          
+
           if (newTime <= 0) {
             stopTimer();
             setIsTimeUp(true);
-            
+
             // Phát nhạc hết giờ
             if (audioHetGioRef.current) {
               audioHetGioRef.current.currentTime = 0;
@@ -543,7 +1058,7 @@ function XepChu() {
                 // Autoplay may be blocked
               });
             }
-            
+
             return 0;
           }
           return newTime;
@@ -551,7 +1066,6 @@ function XepChu() {
       }, 1000);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100">
@@ -563,6 +1077,69 @@ function XepChu() {
           >
             ← Trang chủ
           </Link>
+          <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+            <DialogTrigger asChild>
+              <button className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-400 flex items-center gap-2">
+                <HelpCircle className="w-4 h-4" />
+                <span>Hướng dẫn</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-slate-800/95 border-slate-700 text-slate-100 [&>div]:overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-2xl text-slate-100">
+                  📖 Hướng dẫn chơi Xếp chữ
+                </DialogTitle>
+                <DialogDescription className="text-slate-300 pt-2">
+                  Tổng quan về các level và cách chơi
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-6 pt-4 pr-2">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-200 mb-3">
+                    🎯 Cách chơi
+                  </h3>
+                  <ul className="space-y-2 text-sm text-slate-300 list-disc list-inside">
+                    <li>Quan sát các chữ cái đã được xáo trộn</li>
+                    <li>Sắp xếp các chữ cái để tạo thành từ có nghĩa</li>
+                    <li>
+                      Hoàn thành level hiện tại để mở khóa level tiếp theo
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-200 mb-3">
+                    📊 Thông tin các Level
+                  </h3>
+                  <div className="space-y-4">
+                    {levelInfo.map((info) => (
+                      <div
+                        key={info.levels}
+                        className="rounded-lg border border-slate-700 bg-slate-700/30 p-4"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-12 h-8 rounded-full bg-blue-500 text-white text-sm font-bold">
+                              {info.levels}
+                            </span>
+                            <h4 className="font-semibold text-slate-200">
+                              Level {info.levels}
+                            </h4>
+                          </div>
+                          <span className="px-2 py-1 rounded bg-blue-500/20 text-blue-300 text-xs font-medium">
+                            ⏱️ {info.time}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-300">
+                          {info.description}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <header className="text-center mb-8">
@@ -591,10 +1168,14 @@ function XepChu() {
               level === 0
                 ? "bg-slate-500 text-white shadow-lg"
                 : level > 0 && !completedLevels.has(level)
-                ? "bg-white/5 opacity-50 text-slate-400 cursor-not-allowed"
-                : "bg-white/5 text-slate-300 hover:bg-white/10"
+                  ? "bg-white/5 opacity-50 text-slate-400 cursor-not-allowed"
+                  : "bg-white/5 text-slate-300 hover:bg-white/10"
             }`}
-            title={level > 0 && !completedLevels.has(level) ? "Hoàn thành màn hiện tại trước" : ""}
+            title={
+              level > 0 && !completedLevels.has(level)
+                ? "Hoàn thành màn hiện tại trước"
+                : ""
+            }
           >
             0
           </button>
@@ -603,14 +1184,15 @@ function XepChu() {
             const isCompleted = completedLevels.has(lvl);
             const result = levelResults[lvl];
             const isCurrentlyPlaying = level > 0 && !completedLevels.has(level);
-            const canChange = !isCurrentlyPlaying || lvl === level || isCompleted;
-            
+            const canChange =
+              !isCurrentlyPlaying || lvl === level || isCompleted;
+
             let bgColor = "bg-white/5";
             let textColor = "text-slate-300";
             let hoverClass = "hover:bg-white/10";
             let isDisabled = false;
             let titleText = "";
-            
+
             if (!isUnlocked && !isCompleted) {
               bgColor = "bg-white/5 opacity-30";
               textColor = "text-slate-500";
@@ -624,27 +1206,27 @@ function XepChu() {
               isDisabled = true;
               titleText = "Hoàn thành màn hiện tại trước";
             } else if (isCompleted) {
-              if (result === 'correct') {
+              if (result === "correct") {
                 bgColor = "bg-emerald-500/30";
                 textColor = "text-emerald-300";
-              } else if (result === 'incorrect') {
+              } else if (result === "incorrect") {
                 bgColor = "bg-rose-500/30";
                 textColor = "text-rose-300";
               }
             }
-            
+
             if (level === lvl) {
               bgColor = "bg-blue-500";
               textColor = "text-white";
             }
-            
+
             return (
               <button
                 key={lvl}
                 onClick={() => handleChangeLevel(lvl)}
                 disabled={isDisabled || !canChange}
                 className={`px-3 py-1 rounded-lg text-xs font-medium transition shadow-lg ${bgColor} ${textColor} ${hoverClass} ${
-                  (isDisabled || !canChange) ? "cursor-not-allowed" : ""
+                  isDisabled || !canChange ? "cursor-not-allowed" : ""
                 }`}
                 title={titleText || ""}
               >
@@ -659,14 +1241,15 @@ function XepChu() {
           <section className="mb-6">
             <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-8 sm:p-12 md:p-16 min-h-[300px]">
               <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-linear-to-tr from-slate-500 via-slate-400 to-slate-600 opacity-20 blur-2xl" />
-              
+
               <div className="relative z-10 text-center">
                 <div className="text-4xl sm:text-5xl md:text-6xl mb-4">🔤</div>
                 <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-200 mb-3">
                   Chọn level để bắt đầu
                 </h2>
                 <p className="text-slate-400 text-sm sm:text-base max-w-md mx-auto mb-6">
-                  Nhấn vào các số từ 1 đến 10 để chơi. Mỗi level có thời gian giới hạn khác nhau.
+                  Nhấn vào các số từ 1 đến 10 để chơi. Mỗi level có thời gian
+                  giới hạn khác nhau.
                 </p>
                 <button
                   onClick={handleStart}
@@ -712,7 +1295,7 @@ function XepChu() {
             <section className="mb-6">
               <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6 md:p-8 h-[320px] sm:h-[350px]">
                 <div className="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-linear-to-tr from-blue-500 via-purple-500 to-pink-500 opacity-20 blur-2xl" />
-                
+
                 <div className="relative z-10">
                   {/* Letters Display */}
                   <div
@@ -764,32 +1347,44 @@ function XepChu() {
                   >
                     {(() => {
                       const result = levelResults[level];
-                      const isCorrect = result === 'correct';
-                      const isIncorrect = result === 'incorrect';
-                      
+                      const isCorrect = result === "correct";
+                      const isIncorrect = result === "incorrect";
+
                       return (
                         <>
                           <p className="text-xs sm:text-sm mb-2">
-                            <span className={isCorrect ? "text-emerald-300" : isIncorrect ? "text-rose-300" : "text-emerald-300"}>
+                            <span
+                              className={
+                                isCorrect
+                                  ? "text-emerald-300"
+                                  : isIncorrect
+                                    ? "text-rose-300"
+                                    : "text-emerald-300"
+                              }
+                            >
                               Đáp án:
                             </span>
                             {result && (
-                              <span className={`ml-2 px-2 py-0.5 rounded text-xs font-semibold ${
-                                isCorrect 
-                                  ? "bg-emerald-500/20 text-emerald-300" 
-                                  : "bg-rose-500/20 text-rose-300"
-                              }`}>
+                              <span
+                                className={`ml-2 px-2 py-0.5 rounded text-xs font-semibold ${
+                                  isCorrect
+                                    ? "bg-emerald-500/20 text-emerald-300"
+                                    : "bg-rose-500/20 text-rose-300"
+                                }`}
+                              >
                                 {isCorrect ? "✓ Đúng" : "✗ Sai"}
                               </span>
                             )}
                           </p>
-                          <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 px-2 wrap-break-word ${
-                            isCorrect 
-                              ? "text-emerald-200" 
-                              : isIncorrect 
-                              ? "text-rose-200" 
-                              : "text-emerald-200"
-                          }`}>
+                          <div
+                            className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 px-2 wrap-break-word ${
+                              isCorrect
+                                ? "text-emerald-200"
+                                : isIncorrect
+                                  ? "text-rose-200"
+                                  : "text-emerald-200"
+                            }`}
+                          >
                             {currentWord.toUpperCase()}
                           </div>
                           <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
