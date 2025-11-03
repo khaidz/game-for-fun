@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 
 export const Route = createFileRoute("/games/vong-quay-may-man")({
   component: VongQuayMayMan,
@@ -24,6 +24,45 @@ function VongQuayMayMan() {
   const [result, setResult] = useState<string | null>(null);
   const wheelRef = useRef<SVGGElement>(null);
 
+  // Audio URLs
+  const audioUrlSpinning = useMemo(
+    () => new URL("../../assets/music/wheel-spinning.wav", import.meta.url).href,
+    []
+  );
+  const audioUrlMagic = useMemo(
+    () => new URL("../../assets/music/magic.mp3", import.meta.url).href,
+    []
+  );
+
+  // Audio refs
+  const audioSpinningRef = useRef<HTMLAudioElement | null>(null);
+  const audioMagicRef = useRef<HTMLAudioElement | null>(null);
+
+  // Khởi tạo audio
+  useEffect(() => {
+    // Load nhạc quay
+    audioSpinningRef.current = new Audio(audioUrlSpinning);
+    audioSpinningRef.current.volume = 0.7;
+    audioSpinningRef.current.preload = "auto";
+
+    // Load nhạc magic
+    audioMagicRef.current = new Audio(audioUrlMagic);
+    audioMagicRef.current.volume = 0.7;
+    audioMagicRef.current.preload = "auto";
+
+    // Cleanup audio khi unmount
+    return () => {
+      if (audioSpinningRef.current) {
+        audioSpinningRef.current.pause();
+        audioSpinningRef.current = null;
+      }
+      if (audioMagicRef.current) {
+        audioMagicRef.current.pause();
+        audioMagicRef.current = null;
+      }
+    };
+  }, [audioUrlSpinning, audioUrlMagic]);
+
   // Cập nhật phần thưởng khi chọn sự kiện
   useEffect(() => {
     setRewards(rewardLists[selectedEvent] || rewardLists.default);
@@ -37,51 +76,81 @@ function VongQuayMayMan() {
   }, [selectedEvent]);
 
   // Hàm quay vòng
-const spinWheel = () => {
-  if (isSpinning || rewards.length === 0) return;
+  const spinWheel = () => {
+    if (isSpinning || rewards.length === 0) return;
 
-  setIsSpinning(true);
-  setResult(null);
+    setIsSpinning(true);
+    setResult(null);
 
-  if (wheelRef.current) {
-    const element = wheelRef.current;
-    element.style.transition = "none";
-    element.style.transform = "rotate(0deg)";
-  }
+    // Dừng nhạc magic nếu đang phát
+    if (audioMagicRef.current) {
+      audioMagicRef.current.pause();
+      audioMagicRef.current.currentTime = 0;
+    }
 
-  setTimeout(() => {
-    if (!wheelRef.current) return;
+    // Phát nhạc quay khi bắt đầu
+    if (audioSpinningRef.current) {
+      audioSpinningRef.current.currentTime = 0;
+      audioSpinningRef.current.play().catch(() => {
+        // Autoplay may be blocked
+      });
+    }
 
-    const fullRotations = 10 ; // 10 vòng
-    const totalDegrees = fullRotations * 360;
-
-    // Chọn phần thưởng
-    const randomIndex = Math.floor(Math.random() * rewards.length);
-    const selectedReward = rewards[randomIndex];
-
-     // Tính góc: random trong slice để mũi tên không luôn ở giữa
-     const sliceAngle = 360 / rewards.length;
-     // Random offset từ -40% đến +40% của slice (tránh quá gần biên)
-     const randomOffset = (Math.random() - 0.5) * sliceAngle * 0.8;
-     const targetAngle = randomIndex * sliceAngle + sliceAngle / 2 + randomOffset; // độ (0..360)
- 
-     // Muốn điểm random trong slice dừng ở vị trí mũi tên (top = -90deg).
-     // Khi tính theo hệ dùng ở đây, công thức đơn giản là:
-     const angleToPointer = (360 - targetAngle) % 360;
- 
-     const finalRotation = totalDegrees + angleToPointer;
-
-    const element = wheelRef.current;
-    // thời gian/ easing giống bạn trước, tùy chỉnh nếu muốn
-    element.style.transition = "transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99)";
-    element.style.transform = `rotate(${finalRotation}deg)`;
+    if (wheelRef.current) {
+      const element = wheelRef.current;
+      element.style.transition = "none";
+      element.style.transform = "rotate(0deg)";
+    }
 
     setTimeout(() => {
-      setResult(selectedReward);
-      setIsSpinning(false);
-    }, 6000);
-  }, 10);
-};
+      if (!wheelRef.current) return;
+
+      const fullRotations = 10; // 10 vòng
+      const totalDegrees = fullRotations * 360;
+
+      // Chọn phần thưởng
+      const randomIndex = Math.floor(Math.random() * rewards.length);
+      const selectedReward = rewards[randomIndex];
+
+      // Tính góc: random trong slice để mũi tên không luôn ở giữa
+      const sliceAngle = 360 / rewards.length;
+      // Random offset từ -40% đến +40% của slice (tránh quá gần biên)
+      const randomOffset = (Math.random() - 0.5) * sliceAngle * 0.8;
+      const targetAngle =
+        randomIndex * sliceAngle + sliceAngle / 2 + randomOffset; // độ (0..360)
+
+      // Muốn điểm random trong slice dừng ở vị trí mũi tên (top = -90deg).
+      // Khi tính theo hệ dùng ở đây, công thức đơn giản là:
+      const angleToPointer = (360 - targetAngle) % 360;
+
+      const finalRotation = totalDegrees + angleToPointer;
+
+      const element = wheelRef.current;
+      // thời gian/ easing giống bạn trước, tùy chỉnh nếu muốn
+      element.style.transition =
+        "transform 6s cubic-bezier(0.17, 0.67, 0.12, 0.99)";
+      element.style.transform = `rotate(${finalRotation}deg)`;
+
+      setTimeout(() => {
+        // Dừng nhạc quay
+        if (audioSpinningRef.current) {
+          audioSpinningRef.current.pause();
+          audioSpinningRef.current.currentTime = 0;
+        }
+
+        // Phát nhạc magic khi kết thúc
+        if (audioMagicRef.current) {
+          audioMagicRef.current.currentTime = 0;
+          audioMagicRef.current.play().catch(() => {
+            // Autoplay may be blocked
+          });
+        }
+
+        setResult(selectedReward);
+        setIsSpinning(false);
+      }, 6000);
+    }, 10);
+  };
 
 
   const sliceAngle = 360 / rewards.length;
